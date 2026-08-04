@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedidos · Painel Executivo Julho 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --blue:#0057B8; --blue-light:#3E8EFF; --green:#2BB673; --orange:#FF9800; --red:#E53935;
+  --bg-deep:#070B14; --bg-base:#0A0F1C; --bg-panel: rgba(255,255,255,0.035);
+  --panel-border: rgba(255,255,255,0.08); --panel-border-strong: rgba(255,255,255,0.14);
+  --text-1:#F2F5FA; --text-2:#9AA7BD; --text-3:#5E6C82;
+  --shadow-glow: 0 8px 32px rgba(0,0,0,0.45);
+  --radius-lg:20px; --radius-md:14px; --radius-sm:9px;
+  --sidebar-w:264px; --topbar-h:76px;
+}
+html[data-theme="light"]{
+  --bg-deep:#EEF1F6; --bg-base:#F7F8FB; --bg-panel: rgba(255,255,255,0.75);
+  --panel-border: rgba(15,23,42,0.08); --panel-border-strong: rgba(15,23,42,0.14);
+  --text-1:#111827; --text-2:#4B5768; --text-3:#8996A8;
+  --shadow-glow: 0 8px 28px rgba(15,23,42,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'Inter',sans-serif; background:
+    radial-gradient(1200px 600px at 85% -10%, rgba(0,87,184,0.25), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(43,182,115,0.14), transparent 60%),
+    var(--bg-deep);
+  color:var(--text-1); min-height:100vh; overflow-x:hidden;
+  transition:background .4s ease, color .3s ease;
+}
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-thumb{background:var(--panel-border-strong);border-radius:10px;}
+::-webkit-scrollbar-track{background:transparent;}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;}
+
+/* ---------- Layout shell ---------- */
+.shell{display:flex;min-height:100vh;}
+
+/* ---------- Sidebar ---------- */
+.sidebar{
+  width:var(--sidebar-w); flex-shrink:0; position:fixed; top:0; left:0; bottom:0; z-index:40;
+  background:var(--bg-panel); backdrop-filter:blur(24px) saturate(160%); -webkit-backdrop-filter:blur(24px) saturate(160%);
+  border-right:1px solid var(--panel-border);
+  display:flex; flex-direction:column; padding:22px 14px; transition:transform .35s ease, background .4s ease;
+}
+.brand{display:flex;align-items:center;gap:11px;padding:6px 10px 22px 10px;}
+.brand-mark{
+  width:38px;height:38px;border-radius:11px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--blue),var(--blue-light));
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;
+  box-shadow:0 6px 18px rgba(0,87,184,0.45);
+}
+.brand-txt{display:flex;flex-direction:column;line-height:1.15;}
+.brand-txt strong{font-family:'Space Grotesk',sans-serif;font-size:15.5px;font-weight:700;letter-spacing:.2px;}
+.brand-txt span{font-size:11px;color:var(--text-3);font-weight:500;}
+
+.nav-group-label{font-size:10.5px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-3);font-weight:700;padding:16px 12px 8px;}
+.nav{display:flex;flex-direction:column;gap:2px;position:relative;}
+.nav-item{
+  display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--radius-sm);
+  color:var(--text-2);font-size:13.5px;font-weight:500;cursor:pointer;position:relative;
+  transition:color .2s ease, background .2s ease; z-index:1;
+}
+.nav-item i.ic{width:18px;text-align:center;font-size:14.5px;color:var(--text-3);transition:color .2s ease;}
+.nav-item .badge-dot{
+  margin-left:auto;width:7px;height:7px;border-radius:50%;background:var(--red);
+  box-shadow:0 0 0 0 rgba(229,57,53,.6);animation:pulseDot 2.2s infinite;
+}
+@keyframes pulseDot{
+  0%{box-shadow:0 0 0 0 rgba(229,57,53,.55);}
+  70%{box-shadow:0 0 0 7px rgba(229,57,53,0);}
+  100%{box-shadow:0 0 0 0 rgba(229,57,53,0);}
+}
+.nav-item:hover{color:var(--text-1);background:rgba(255,255,255,0.04);}
+.nav-item.active{color:#fff;}
+.nav-item.active i.ic{color:#fff;}
+.nav-highlight{
+  position:absolute;left:8px;right:8px;height:38px;border-radius:var(--radius-sm);
+  background:linear-gradient(120deg,var(--blue),var(--blue-light));
+  box-shadow:0 6px 20px rgba(0,87,184,.4); z-index:0;
+  transition:transform .38s cubic-bezier(.65,0,.35,1);
+}
+.sidebar-foot{margin-top:auto;padding:14px 12px 4px;border-top:1px solid var(--panel-border);}
+.mini-stat{display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-3);padding:5px 0;}
+.mini-stat b{color:var(--text-1);font-weight:600;}
+
+/* ---------- Topbar ---------- */
+.main{flex:1;margin-left:var(--sidebar-w);min-height:100vh;display:flex;flex-direction:column;}
+.topbar{
+  height:var(--topbar-h);position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:16px;
+  padding:0 30px;background:var(--bg-panel);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);
+  border-bottom:1px solid var(--panel-border);
+}
+.menu-toggle{display:none;background:none;border:none;color:var(--text-1);font-size:18px;cursor:pointer;}
+.topbar-title{display:flex;flex-direction:column;line-height:1.2;}
+.topbar-title h1{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600;}
+.topbar-title span{font-size:11.5px;color:var(--text-3);}
+.period-pill{
+  margin-left:6px;display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--text-2);
+  background:rgba(255,255,255,0.04);border:1px solid var(--panel-border);padding:7px 13px;border-radius:100px;
+}
+.period-pill i{color:var(--blue-light);}
+.topbar-actions{margin-left:auto;display:flex;align-items:center;gap:12px;}
+.search-box{
+  display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.04);border:1px solid var(--panel-border);
+  border-radius:100px;padding:8px 14px;min-width:230px;transition:border-color .2s ease, background .2s ease;
+}
+.search-box:focus-within{border-color:var(--blue-light);background:rgba(62,142,255,0.07);}
+.search-box i{color:var(--text-3);font-size:12.5px;}
+.search-box input{background:none;border:none;outline:none;color:var(--text-1);font-size:12.5px;width:100%;}
+.search-box input::placeholder{color:var(--text-3);}
+.icon-btn{
+  width:38px;height:38px;border-radius:11px;border:1px solid var(--panel-border);background:rgba(255,255,255,0.04);
+  color:var(--text-2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;
+  transition:all .25s ease;position:relative;overflow:hidden;
+}
+.icon-btn:hover{color:#fff;border-color:var(--blue-light);background:rgba(62,142,255,0.14);transform:translateY(-2px);}
+.icon-btn:active{transform:translateY(0) scale(.94);}
+
+/* ---------- Content ---------- */
+.content{padding:28px 32px 60px;max-width:1480px;width:100%;margin:0 auto;}
+.view{display:none;animation:viewIn .5s cubic-bezier(.16,1,.3,1);}
+.view.active{display:block;}
+@keyframes viewIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+
+.view-head{margin-bottom:22px;}
+.eyebrow{font-size:11.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--blue-light);margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.view-head h2{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:600;margin-bottom:6px;}
+.view-head p{color:var(--text-2);font-size:13.5px;max-width:640px;line-height:1.5;}
+
+/* ---------- Glass card ---------- */
+.card{
+  background:var(--bg-panel);border:1px solid var(--panel-border);border-radius:var(--radius-lg);
+  backdrop-filter:blur(18px) saturate(150%);-webkit-backdrop-filter:blur(18px) saturate(150%);
+  box-shadow:var(--shadow-glow); position:relative; overflow:hidden;
+  transition:transform .3s cubic-bezier(.16,1,.3,1), box-shadow .3s ease, border-color .3s ease;
+}
+.card::before{
+  content:"";position:absolute;inset:0;padding:1px;border-radius:inherit;
+  background:linear-gradient(140deg,rgba(255,255,255,0.16),transparent 40%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none;
+}
+.card.hoverable:hover{transform:translateY(-4px);border-color:var(--panel-border-strong);}
+
+/* ---------- KPI grid ---------- */
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:22px;}
+.kpi-card{padding:20px 20px 18px;display:flex;flex-direction:column;gap:10px;}
+.kpi-top{display:flex;align-items:center;justify-content:space-between;}
+.kpi-label{font-size:12px;color:var(--text-2);font-weight:600;}
+.kpi-icon{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;}
+.kpi-value{font-family:'Space Grotesk',sans-serif;font-size:27px;font-weight:700;letter-spacing:-.5px;}
+.kpi-sub{font-size:11.5px;color:var(--text-3);display:flex;align-items:center;gap:6px;}
+.kpi-sub b{color:var(--green);font-weight:700;}
+.kpi-sub b.neg{color:var(--red);}
+
+.trend-mini{height:36px;margin-top:2px;}
+
+/* ---------- Insight list ---------- */
+.insight-card{padding:22px 24px;}
+.insight-item{display:flex;gap:14px;padding:13px 0;border-bottom:1px solid var(--panel-border);}
+.insight-item:last-child{border-bottom:none;}
+.insight-num{
+  flex-shrink:0;width:26px;height:26px;border-radius:8px;background:rgba(62,142,255,0.14);color:var(--blue-light);
+  display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;font-family:'Space Grotesk',sans-serif;
+}
+.insight-item p{font-size:13.2px;color:var(--text-2);line-height:1.55;}
+.insight-item p b, .insight-item p strong{color:var(--text-1);font-weight:700;}
+
+/* ---------- Section grids ---------- */
+.grid-2{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;}
+.grid-2-rev{display:grid;grid-template-columns:1fr 1.3fr;gap:18px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.section-title{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:9px;}
+.section-title i{color:var(--blue-light);font-size:13px;}
+.pad{padding:22px 24px;}
+.mb{margin-bottom:18px;}
+
+/* ---------- Table ---------- */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12.8px;}
+thead th{
+  text-align:left;font-size:10.8px;text-transform:uppercase;letter-spacing:.6px;color:var(--text-3);
+  font-weight:700;padding:9px 14px;border-bottom:1px solid var(--panel-border-strong);white-space:nowrap;position:sticky;top:0;background:var(--bg-base);z-index:2;
+}
+tbody td{padding:11px 14px;border-bottom:1px solid var(--panel-border);color:var(--text-2);white-space:nowrap;}
+tbody tr{transition:background .18s ease;}
+tbody tr:hover{background:rgba(255,255,255,0.035);}
+tbody tr:last-child td{border-bottom:none;}
+td.num, th.num{text-align:right;font-family:'JetBrains Mono',monospace;}
+td.strong{color:var(--text-1);font-weight:600;}
+.rank-chip{
+  display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:7px;
+  background:rgba(255,255,255,0.06);font-size:11px;font-weight:700;color:var(--text-2);font-family:'Space Grotesk',sans-serif;
+}
+.rank-chip.top{background:linear-gradient(135deg,var(--orange),#ffb300);color:#20140a;}
+.bar-mini{position:relative;height:6px;border-radius:6px;background:rgba(255,255,255,0.07);width:100px;overflow:hidden;}
+.bar-mini i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;}
+.split-bar{display:flex;height:7px;border-radius:6px;overflow:hidden;width:120px;background:rgba(255,255,255,0.06);}
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:10.7px;font-weight:700;padding:4px 9px;border-radius:100px;letter-spacing:.3px;}
+.tag.critico{background:rgba(229,57,53,0.14);color:#ff7a76;}
+.tag.alto{background:rgba(255,152,0,0.15);color:#ffb347;}
+.tag.ok{background:rgba(43,182,115,0.15);color:#59d999;}
+
+/* ---------- Chart holder ---------- */
+.chart-holder{position:relative;width:100%;}
+.legend-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px;}
+.legend-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-2);}
+.legend-dot{width:9px;height:9px;border-radius:3px;}
+
+/* ---------- Recommendation cards ---------- */
+.reco-card{padding:16px 18px;display:flex;flex-direction:column;gap:8px;}
+.reco-city{display:flex;align-items:center;gap:9px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;}
+.reco-city i{color:var(--green);font-size:12px;}
+.reco-card p{font-size:12.3px;color:var(--text-2);line-height:1.55;}
+
+/* ---------- Gateway / incident ---------- */
+.alert-banner{
+  display:flex;gap:16px;align-items:flex-start;padding:20px 22px;border-radius:var(--radius-lg);
+  background:linear-gradient(120deg,rgba(229,57,53,0.14),rgba(229,57,53,0.04));border:1px solid rgba(229,57,53,0.3);
+  margin-bottom:20px;
+}
+.alert-banner .aicon{
+  width:44px;height:44px;border-radius:12px;background:rgba(229,57,53,0.18);color:#ff7a76;
+  display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;
+  animation:alertPulse 2.4s infinite;
+}
+@keyframes alertPulse{0%,100%{box-shadow:0 0 0 0 rgba(229,57,53,.35);}50%{box-shadow:0 0 0 10px rgba(229,57,53,0);}}
+.alert-banner h3{font-family:'Space Grotesk',sans-serif;font-size:16.5px;margin-bottom:5px;}
+.alert-banner p{font-size:13px;color:var(--text-2);line-height:1.55;}
+
+.timeline{display:flex;flex-direction:column;gap:0;position:relative;padding-left:6px;}
+.tl-item{display:flex;gap:16px;position:relative;padding-bottom:22px;}
+.tl-item:last-child{padding-bottom:0;}
+.tl-dot-wrap{display:flex;flex-direction:column;align-items:center;}
+.tl-dot{width:13px;height:13px;border-radius:50%;background:var(--red);box-shadow:0 0 0 4px rgba(229,57,53,0.15);flex-shrink:0;z-index:1;}
+.tl-dot.success{background:var(--green);box-shadow:0 0 0 4px rgba(43,182,115,0.18);}
+.tl-line{flex:1;width:2px;background:linear-gradient(var(--red),var(--panel-border));margin-top:2px;}
+.tl-item:last-child .tl-line{display:none;}
+.tl-body{padding-top:-2px;}
+.tl-time{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--text-3);}
+.tl-title{font-size:13.3px;font-weight:600;color:var(--text-1);margin:2px 0 3px;}
+.tl-desc{font-size:12.3px;color:var(--text-2);}
+
+.metric-card{padding:16px 18px;}
+.metric-card .mlabel{font-size:11.8px;color:var(--text-2);font-weight:600;margin-bottom:8px;}
+.metric-card .mvalue{font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:700;margin-bottom:8px;}
+
+.action-col{display:flex;flex-direction:column;gap:12px;}
+.action-card{padding:15px 17px;display:flex;flex-direction:column;gap:6px;border-left:3px solid var(--blue-light);}
+.action-prazo{font-size:10.3px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;}
+.action-prazo.imediata{color:#ff7a76;}
+.action-prazo.curto{color:#ffb347;}
+.action-prazo.medio{color:var(--blue-light);}
+.action-prazo.longo{color:var(--green);}
+.action-title{font-size:13.6px;font-weight:700;font-family:'Space Grotesk',sans-serif;}
+.action-desc{font-size:12.2px;color:var(--text-2);line-height:1.5;}
+
+.compare-wrap{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.compare-card{padding:20px 22px;}
+.compare-card.now{border-color:rgba(229,57,53,0.35);}
+.compare-card.after{border-color:rgba(43,182,115,0.35);}
+.compare-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--panel-border);font-size:12.8px;}
+.compare-row:last-child{border-bottom:none;}
+.compare-row span{color:var(--text-2);}
+.compare-row b{font-family:'JetBrains Mono',monospace;font-size:13px;}
+
+/* ---------- Freight illustration ---------- */
+.box-compare{display:flex;align-items:flex-end;gap:46px;justify-content:center;padding:30px 10px 10px;}
+.box-item{display:flex;flex-direction:column;align-items:center;gap:10px;}
+.box-shape{border-radius:8px;position:relative;}
+.box-shape.small{width:70px;height:70px;background:linear-gradient(150deg,var(--blue),var(--blue-light));box-shadow:0 10px 24px rgba(0,87,184,.35);}
+.box-shape.big{width:150px;height:120px;background:linear-gradient(150deg,var(--orange),#ffc247);box-shadow:0 14px 30px rgba(255,152,0,.32);}
+.box-item span{font-size:11.6px;color:var(--text-2);text-align:center;}
+.box-item b{color:var(--text-1);font-size:12.6px;}
+
+/* ---------- Filters bar (Dados Detalhados) ---------- */
+.filters-bar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;}
+.filters-bar select, .filters-bar .fsearch{
+  background:rgba(255,255,255,0.045);border:1px solid var(--panel-border);color:var(--text-1);
+  padding:9px 13px;border-radius:10px;font-size:12.5px;outline:none;font-family:'Inter',sans-serif;cursor:pointer;
+}
+.filters-bar select:focus, .filters-bar .fsearch:focus{border-color:var(--blue-light);}
+.filters-bar .fsearch{cursor:text;min-width:220px;}
+.pager{display:flex;align-items:center;gap:10px;justify-content:flex-end;margin-top:14px;font-size:12.3px;color:var(--text-2);}
+.pager button{
+  width:30px;height:30px;border-radius:8px;border:1px solid var(--panel-border);background:rgba(255,255,255,0.04);
+  color:var(--text-1);cursor:pointer;transition:all .2s ease;
+}
+.pager button:hover:not(:disabled){border-color:var(--blue-light);color:var(--blue-light);}
+.pager button:disabled{opacity:.35;cursor:not-allowed;}
+
+/* ---------- Footer ---------- */
+.foot{margin-top:34px;padding:18px 0;text-align:center;font-size:11.5px;color:var(--text-3);}
+
+/* ---------- Scroll reveal ---------- */
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease, transform .6s cubic-bezier(.16,1,.3,1);}
+.reveal.in{opacity:1;transform:translateY(0);}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1180px){
+  .kpi-grid{grid-template-columns:repeat(3,1fr);}
+  .grid-2, .grid-2-rev{grid-template-columns:1fr;}
+  .grid-3{grid-template-columns:repeat(2,1fr);}
+  .compare-wrap{grid-template-columns:1fr;}
+}
+@media (max-width:860px){
+  :root{--sidebar-w:238px;}
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;}
+  .menu-toggle{display:block;}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .content{padding:20px 16px 50px;}
+  .search-box{display:none;}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark"><i class="fa-solid fa-capsules"></i></div>
+      <div class="brand-txt">
+        <strong>Pedidos · Julho</strong>
+        <span>Painel executivo de vendas</span>
+      </div>
+    </div>
+
+    <div class="nav-group-label">Visão geral</div>
+    <nav class="nav" id="navPrimary">
+      <div class="nav-highlight" id="navHighlight"></div>
+      <div class="nav-item active" data-view="overview"><i class="ic fa-solid fa-gauge-high"></i>Visão Geral</div>
+      <div class="nav-item" data-view="evolucao"><i class="ic fa-solid fa-chart-line"></i>Evolução Diária</div>
+    </nav>
+
+    <div class="nav-group-label">Vendas &amp; clientes</div>
+    <nav class="nav navB">
+      <div class="nav-item" data-view="cidades"><i class="ic fa-solid fa-map-location-dot"></i>Faturamento por Cidade</div>
+      <div class="nav-item" data-view="pagamentos"><i class="ic fa-solid fa-credit-card"></i>Métodos de Pagamento</div>
+      <div class="nav-item" data-view="canais"><i class="ic fa-solid fa-truck-fast"></i>Canais &amp; SLA</div>
+      <div class="nav-item" data-view="produtos"><i class="ic fa-solid fa-ranking-star"></i>Top Produtos</div>
+    </nav>
+
+    <div class="nav-group-label">Operação</div>
+    <nav class="nav navB">
+      <div class="nav-item" data-view="status"><i class="ic fa-solid fa-triangle-exclamation"></i>Status &amp; Cancelamentos<span class="badge-dot"></span></div>
+      <div class="nav-item" data-view="cupons"><i class="ic fa-solid fa-ticket"></i>Cupons &amp; Descontos</div>
+      <div class="nav-item" data-view="frete"><i class="ic fa-solid fa-box-open"></i>Frete</div>
+      <div class="nav-item" data-view="dados"><i class="ic fa-solid fa-table-list"></i>Dados Detalhados</div>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="mini-stat"><span>Faturamento Jul</span><b>R$ 67.633</b></div>
+      <div class="mini-stat"><span>Pedidos</span><b>902</b></div>
+      <div class="mini-stat"><span>ERP</span><b>Vetor</b></div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+    <header class="topbar">
+      <button class="menu-toggle" id="menuToggle"><i class="fa-solid fa-bars"></i></button>
+      <div class="topbar-title">
+        <h1 id="topbarTitle">Visão Geral</h1>
+        <span id="topbarSub">Análise de pedidos e faturamento</span>
+      </div>
+      <div class="period-pill"><i class="fa-regular fa-calendar"></i>01 – 31 Jul 2026</div>
+      <div class="topbar-actions">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="globalSearch" placeholder="Buscar pedido, cidade, produto...">
+        </div>
+        <button class="icon-btn" id="themeToggle" title="Alternar tema"><i class="fa-solid fa-moon"></i></button>
+        <button class="icon-btn" title="Exportar"><i class="fa-solid fa-arrow-up-from-bracket"></i></button>
+      </div>
+    </header>
+
+    <main class="content" id="content">
+
+      <!-- ============ VIEW: OVERVIEW ============ -->
+      <section class="view active" id="view-overview">
+        <div class="view-head">
+          <div class="eyebrow"><i class="fa-solid fa-gauge-high"></i> Dashboard de Análise de Pedidos</div>
+          <h2>Julho de 2026 em um só lugar</h2>
+          <p>Período de 01/07/2026 a 31/07/2026 · 902 pedidos analisados (811 faturados, 90 cancelados, 1 em preparo) em 10 frentes de negócio.</p>
+        </div>
+
+        <div class="kpi-grid" id="kpiGrid"></div>
+
+        <div class="grid-2 mb">
+          <div class="card hoverable pad reveal">
+            <div class="section-title"><i class="fa-solid fa-chart-area"></i>Evolução do faturamento (31 dias)</div>
+            <div class="chart-holder" style="height:260px;"><canvas id="chartOverviewEvo"></canvas></div>
+          </div>
+          <div class="card hoverable pad reveal">
+            <div class="section-title"><i class="fa-solid fa-circle-dollar-to-slot"></i>Composição do faturamento</div>
+            <div class="chart-holder" style="height:200px;"><canvas id="chartOverviewSplit"></canvas></div>
+            <div class="legend-row" id="splitLegend"></div>
+          </div>
+        </div>
+
+        <div class="card insight-card reveal">
+          <div class="section-title"><i class="fa-solid fa-lightbulb"></i>Insights Estratégicos</div>
+          <div id="insightsList"></div>
+        </div>
+      </section>
+
+      <!-- ============ VIEW: CIDADES ============ -->
+      <section class="view" id="view-cidades">
+        <div class="view-head">
+          <div class="eyebrow"><i class="fa-solid fa-map-location-dot"></i> Faturamento por Cidade</div>
+          <h2>Análise detalhada com mix de pagamento</h2>
+          <p>Faturamento, pedidos e distribuição Pix × Cartão por cidade, com oportunidades de campanha.</p>
+        </div>
+
+        <div class="grid-2 mb">
+          <div class="card hoverable pad reveal">
+            <div class="section-title"><i class="fa-solid fa-chart-simple"></i>Faturamento por cidade</div>
+            <div class="chart-holder" style="height:340px;"><canvas id="chartCidades"></canvas></div>
+          </div>
+          <div class="card hoverable pad reveal">
+            <div class="section-title"><i class="fa-solid fa-table-cells"></i>Mix de pagamento por cidade</div>
+            <div class="tbl-wrap" style="max-height:340px;overflow-y:auto;">
+              <table>
+                <thead><tr><th>Cidade</th><th class="num">Pedidos</th><th>Mix Pix / Cartão</th></tr></thead>
+                <tbody id="cidadesMixBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="card pad mb reveal">
+          <div class="section-title"><i class="fa-solid fa-list-ol"></i>Detalhamento completo</div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr>
+                <th>Cidade</th><th class="num">Faturamento</th><th class="num">Pedidos</th>
+                <th class="num">Ticket Médio</th><th class="num">% Pix</th><th class="num">% Cartão</th><th class="num">% Faturamento</th>
+              </tr></thead>
+              <tbody id="cidadesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="section-title reveal"><i class="fa-solid fa-bullhorn"></i>Recomendações de campanhas por cidade</div>
+        <div class="grid-3" id="recoGrid"></div>
+      </section>
+
+      <!-- ============ VIEW: PAGAMENTOS ============ -->
+      <section class="view" id="view-pagamentos">
+        <div class="view-head">
+          <div class="eyebrow"><i class="fa-solid fa-credit-card"></i> Métodos de Pagamento</div>
+          <h2>Distribuição, receita e comportamento por método</h2>
+          <p>Pix domina em volume; cartões geram maior ticket médio. Veja a distribuição completa e o cruzamento com cidades.</p>
+        </div>
+
+        <div class="grid-2 mb">
+          <div class="card hoverable pad reveal">
+            <div class="section-title"><i class="fa-solid fa-chart-pie"></i>Participação no faturamento</div>
+            <div class="chart-holder" style="height:280px;"><canvas id="chartPagamentosDonut"></canvas></div>
+            <div class="legend-row" id="pagamentosLegend"></div>
+          </div>
+          <div class="card hoverable pad reveal">
+            <div class="section-title"><i class="fa-solid fa-scale-balanced"></i>Pix vs. Cartão — ticket médio</div>
+            <div class="chart-holder" style="height:280px;"><canvas id="chartTicketCompare"></canvas></div>
+          </div>
+        </div>
+
+        <div class="card pad mb reveal">
+          <div class="section-title"><i class="fa-solid fa-table-list"></i>Detalhamento por método</div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr>
+                <th>Método</th><th class="num">Faturamento</th><th class="num">Pedidos</th><th class="num">% Pedidos</th>
+                <th class="num">Ticket Médio</th><th class="num">Mín.</th><th class="num">Máx.</th><th class="num">% Faturamento</th>
+              </tr></thead>
+              <tbody id="pagamentosTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="grid-2-rev mb">
+          <div class="card pad reveal">
+            <div class="section-title"><i class="fa-solid fa-circle-info"></i>Análise &amp; recomendações</div>
+            <div id="pagamentosInsights"></div>
+          </div>
+          <div class="card pad reveal">
+            <div class="section-title"><i class="fa-solid fa-diagram-project"></i>Cruzamento: método × cidade (Top 5)</div>
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>Cidade</th><th class="num">Total</th><th>Pix</th><th>Mastercard</th><th>Visa</th><th>Outros</th></tr></thead>
+                <tbody id="crossTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ VIEW: CANAIS ============ -->
+      <section class="view" id="view-canais">
+        <div class="view-head">
+          <div class="eyebrow"><i class="fa-solid fa-truck-fast"></i> Canais e Métodos de Entrega</div>
+          <h2>Performance por canal de aquisição e tipo de entrega</h2>
+          <p>De onde vêm os pedidos e como chegam até o cliente — com detalhamento por courrier.</p>
+        </div>
+
+        <div class="grid-2 mb">
+          <div class="card hoverable pad reveal">
+            <div class="section-title"><i class="fa-solid fa-mobile-screen"></i>Canal de aquisição (UtmSource)</div>
+            <div class="chart-holder" style="height:270px;"><canvas id="chartCanais"></canvas></div>
+          </div>
+          <div class="card hoverable pad reveal">
+            <div class="section-title"><i class="fa-solid fa-route"></i>Método de entrega (SLA)</div>
+            <div class="chart-holder" style="height:270px;"><canvas id="chartSLA"></canvas></div>
+          </div>
+        </div>
+
+        <div class="grid-2 mb">
+          <div class="card pad reveal">
+            <div class="section-title"><i class="fa-solid fa-table-list"></i>Canais de aquisição — detalhado</div>
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>Canal</th><th class="num">Faturamento</th><th class="num">Pedidos</th><th class="num">% Pedidos</th><th class="num">Ticket Médio</th></tr></thead>
+              <tbody id="canaisTableBody"></tbody>
+            </table></div>
+          </div>
+          <div class="card pad reveal">
+            <div class="section-title"><i class="fa-solid fa-table-list"></i>Métodos de entrega — detalhado</div>
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>Entrega</th><th class="num">Faturamento</th><th class="num">Pedidos</th><th class="num">% Pedidos</th><th class="num">Ticket Médio</th></tr></thead>
+              <tbody id="slaTableBody"></tbody>
+            </table></div>
+          </div>
+        </div>
+
+        <div class="card pad mb reveal">
+          <div class="section-title"><i class="fa-solid fa-van-shuttle"></i>Detalhamento por courrier (Top 8)</div>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Courrier</th><th class="num">Pedidos</th><th>% do Total</th></tr></thead>
+            <tbody id="courrierTableBody"></tbody>
+          </table></div>
+        </div>
+
+        <div class="card insight-card reveal">
+          <div class="section-title"><i class="fa-solid fa-lightbulb"></i>Insights de canais e entrega</div>
+          <div id="canaisInsights"></div>
+        </div>
+      </section>
+
+      <!-- ============ VIEW: EVOLUCAO ============ -->
+      <section class="view" id="view-evolucao">
+        <div class="view-head">
+          <div class="eyebrow"><i class="fa-solid fa-chart-line"></i> Evolução Diária</div>
+          <h2>Tendência de faturamento e pedidos</h2>
+          <p>Análise temporal com tendência e sazonalidade ao longo dos 31 dias de julho.</p>
+        </div>
+
+        <div class="card hoverable pad mb reveal">
+          <div class="section-title"><i class="fa-solid fa-chart-area"></i>Faturamento × Pedidos por dia</div>
+          <div class="chart-holder" style="height:340px;"><canvas id="chartEvolucao"></canvas></div>
+        </div>
+
+        <div class="grid-2-rev">
+          <div class="card insight-card reveal">
+            <div class="section-title"><i class="fa-solid fa-arrow-trend-up"></i>Tendências e padrões</div>
+            <div id="evolucaoInsights"></div>
+          </div>
+          <div class="card pad reveal">
+            <div class="section-title"><i class="fa-solid fa-table-list"></i>Detalhamento diário</div>
+            <div class="tbl-wrap" style="max-height:360px;overflow-y:auto;">
+              <table>
+                <thead><tr><th>Data</th><th>Dia</th><th class="num">Faturamento</th><th class="num">Pedidos</th><th class="num">Ticket Médio</th></tr></thead>
+                <tbody id="evolucaoTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ VIEW: PRODUTOS ============ -->
+      <section class="view" id="view-produtos">
+        <div class="view-head">
+          <div class="eyebrow"><i class="fa-solid fa-ranking-star"></i> Top 20 Produtos por Faturamento</div>
+          <h2>Ranking dos produtos mais vendidos</h2>
+          <p>Produtos que mais geraram receita no período — oportunidades de estoque e reposição.</p>
+        </div>
+
+        <div class="card hoverable pad mb reveal">
+          <div class="section-title"><i class="fa-solid fa-chart-simple"></i>Top 10 por faturamento</div>
+          <div class="chart-holder" style="height:360px;"><canvas id="chartProdutos"></canvas></div>
+        </div>
+
+        <div class="card pad reveal">
+          <div class="section-title"><i class="fa-solid fa-list-ol"></i>Ranking completo (Top 20)</div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Produto</th><th class="num">Faturamento</th><th class="num">Qtd.</th><th class="num">Pedidos</th><th class="num">Preço Médio</th></tr></thead>
+              <tbody id="produtosTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ VIEW: STATUS ============ -->
+      <section class="view" id="view-status">
+        <div class="view-head">
+          <div class="eyebrow" style="color:#ff7a76;"><i class="fa-solid fa-triangle-exclamation"></i> Status e Cancelamentos</div>
+          <h2>90 pedidos cancelados (10,0%) — R$ 28.565,58 em receita potencial perdida</h2>
+          <p>Panorama de status dos pedidos e onde os cancelamentos mais acontecem.</p>
+        </div>
+
+        <div class="alert-banner reveal">
+          <div class="aicon"><i class="fa-solid fa-circle-xmark"></i></div>
+          <div>
+            <h3>1 em cada 10 pedidos é cancelado — 42,2% do faturamento potencial</h3>
+            <p>Ticket médio dos cancelados é <b style="color:#fff;">R$ 317,40</b> — quase 4x maior que o ticket médio geral, indicando que os pedidos de maior valor são os que mais cancelam. <b style="color:#fff;">Teófilo Otoni</b> concentra 61,1% dos cancelamentos, via <b style="color:#fff;">App Android</b>, pagos principalmente com <b style="color:#fff;">Visa</b>.</p>
+          </div>
+        </div>
+
+        <div class="grid-3 mb" id="statusSummary"></div>
+
+        <div class="grid-2 mb">
+          <div class="card pad reveal">
+            <div class="section-title"><i class="fa-solid fa-map-location-dot"></i>Cancelamentos por cidade</div>
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>Cidade</th><th class="num">Cancelados</th><th>% do Total</th></tr></thead>
+              <tbody id="cancelCidadeBody"></tbody>
+            </table></div>
+          </div>
+          <div class="card pad reveal">
+            <div class="section-title"><i class="fa-solid fa-credit-card"></i>Cancelamentos por método de pagamento</div>
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>Pagamento</th><th class="num">Cancelados</th><th>% do Total</th></tr></thead>
+              <tbody id="cancelPagamentoBody"></tbody>
+            </table></div>
+          </div>
+        </div>
+
+        <div class="card insight-card reveal">
+          <div class="section-title"><i class="fa-solid fa-list-check"></i>Recomendações</div>
+          <div id="statusRecos"></div>
+        </div>
+      </section>
+
+      <!-- ============ VIEW: CUPONS ============ -->
+      <section class="view" id="view-cupons">
+        <div class="view-head">
+          <div class="eyebrow"><i class="fa-solid fa-ticket"></i> Cupons e Descontos</div>
+          <h2>Performance de campanhas e cupons</h2>
+          <p>15,1% dos pedidos usaram cupom, com ticket médio 13% maior que os pedidos sem desconto.</p>
+        </div>
+
+        <div class="kpi-grid" id="cuponsSummary" style="grid-template-columns:repeat(5,1fr);"></div>
+
+        <div class="grid-2-rev mb">
+          <div class="card pad reveal">
+            <div class="section-title"><i class="fa-solid fa-trophy"></i>Top cupons</div>
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>Cupom</th><th class="num">Pedidos</th><th>% Total</th><th class="num">Faturamento</th><th class="num">Ticket Médio</th><th>Cidade Top</th></tr></thead>
+              <tbody id="cuponsTableBody"></tbody>
+            </table></div>
+          </div>
+          <div class="card insight-card reveal">
+            <div class="section-title"><i class="fa-solid fa-lightbulb"></i>Insights e recomendações</div>
+            <div id="cuponsInsights"></div>
+          </div>
+        </div>
+
+        <div class="card pad reveal">
+          <div class="section-title"><i class="fa-solid fa-tags"></i>Tipos de desconto</div>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Tipo de desconto</th><th class="num">Pedidos</th><th class="num">Faturamento</th><th>% do Total</th></tr></thead>
+            <tbody id="descontosTableBody"></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- ============ VIEW: FRETE ============ -->
+      <section class="view" id="view-frete">
+        <div class="view-head">
+          <div class="eyebrow"><i class="fa-solid fa-box-open"></i> Frete</div>
+          <h2>Possíveis erros na faixa de peso</h2>
+          <p>Peso cubado pode estar distorcendo o custo de frete de itens volumosos e leves.</p>
+        </div>
+
+        <div class="card pad mb reveal">
+          <div class="section-title"><i class="fa-solid fa-cube"></i>Peso real × peso cubado</div>
+          <div class="box-compare">
+            <div class="box-item">
+              <div class="box-shape small"></div>
+              <b>Caixa de medicamento</b>
+              <span>~10 × 10 × 10 cm</span>
+            </div>
+            <div class="box-item">
+              <div class="box-shape big"></div>
+              <b>Embalagem tipo TENA</b>
+              <span>~40 × 30 × 20 cm · peso cubado 4–5 kg</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card insight-card reveal">
+          <div class="section-title"><i class="fa-solid fa-lightbulb"></i>Insight</div>
+          <div class="insight-item">
+            <div class="insight-num">01</div>
+            <p>Uma caixa de medicamento pode ter cerca de <b>10 × 10 × 10 cm</b>, enquanto uma embalagem tipo TENA pode exigir algo próximo de <b>40 × 30 × 20 cm</b>. O peso cubado dessa TENA pode ficar entre <b>4 e 5 kg</b>, mesmo que o peso real seja bem menor. Em muitos contratos dos Correios, essa diferença costuma gerar um frete perceptivelmente maior — vale revisar a tabela para produtos volumosos e leves.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ VIEW: DADOS ============ -->
+      <section class="view" id="view-dados">
+        <div class="view-head">
+          <div class="eyebrow"><i class="fa-solid fa-table-list"></i> Dados Detalhados</div>
+          <h2>Base completa de pedidos</h2>
+          <p>902 pedidos individuais com filtros ativos e cabeçalho congelado durante a rolagem.</p>
+        </div>
+
+        <div class="card pad reveal">
+          <div class="filters-bar">
+            <input class="fsearch" id="dSearch" placeholder="Buscar cidade, pedido...">
+            <select id="fCidade"><option value="">Todas as cidades</option></select>
+            <select id="fPagamento"><option value="">Todos os pagamentos</option></select>
+            <select id="fCanal"><option value="">Todos os canais</option></select>
+            <select id="fEntrega"><option value="">Todas as entregas</option></select>
+            <select id="fStatus"><option value="">Todos os status</option></select>
+          </div>
+          <div class="tbl-wrap" style="max-height:480px;overflow-y:auto;">
+            <table>
+              <thead><tr>
+                <th>Data</th><th>Cidade</th><th>UF</th><th>Pagamento</th><th>Canal</th><th>Entrega</th><th>Status</th><th>Cupom</th>
+                <th class="num">Itens</th><th class="num">Valor Total</th><th class="num">Frete</th>
+              </tr></thead>
+              <tbody id="dadosTableBody"></tbody>
+            </table>
+          </div>
+          <div class="pager">
+            <span id="dInfo"></span>
+            <button id="dPrev"><i class="fa-solid fa-chevron-left"></i></button>
+            <button id="dNext"><i class="fa-solid fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </section>
+
+      <div class="foot">Painel gerado a partir da base de pedidos · Julho de 2026 · ERP Vetor</div>
+    </main>
+  </div>
+</div>
+
+<script>
+const ORDERS = [["01/07","Vitória","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,29.18,0.0],["01/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",3,87.47,0.0],["01/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","MARCELLA10",2,130.75,0.0],["01/07","Nova Andradina","MS","Pix","—","Correios","Faturado","—",1,162.09,63.42],["01/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",1,49.88,5.99],["01/07","Teófilo Otoni","MG","Visa","—","Flash Delivery","Faturado","—",1,148.09,0.0],["01/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",2,184.37,0.0],["01/07","Vitória","ES","Visa","google","Retire em Loja","Faturado","—",3,29.27,0.0],["01/07","Rio de Janeiro","RJ","Mastercard","—","Correios","Cancelado","—",2,1573.23,40.73],["01/07","Teófilo Otoni","MG","Mastercard","APP_IOS","Flash Delivery","Faturado","—",5,141.54,0.0],["01/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,18.89,0.0],["01/07","Vitória","ES","Pix","—","Retire em Loja","Faturado","—",3,45.67,0.0],["01/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,103.89,0.0],["01/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",2,40.78,0.0],["01/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Flash Delivery","Faturado","—",2,47.77,4.04],["01/07","Vila Velha","ES","Pix","APP_IOS","Retire em Loja","Faturado","—",5,248.94,0.0],["01/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,29.98,5.99],["01/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,27.28,0.0],["01/07","Carlos Chagas","MG","Pix","—","Retire em Loja","Faturado","—",1,14.89,0.0],["01/07","Carlos Chagas","MG","Mastercard","APP_IOS","Retire em Loja","Faturado","RANIELLE10",2,49.02,0.0],["01/07","Teófilo Otoni","MG","Visa","APP_ANDROID","Flash Delivery","Faturado","—",6,199.54,0.0],["01/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Cancelado","—",2,22.18,0.0],["01/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",2,14.88,0.0],["01/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,14.59,0.0],["01/07","Teófilo Otoni","MG","Visa","APP_ANDROID","Flash Delivery","Faturado","CRESCERAPP12",1,31.41,5.99],["01/07","Limeira","SP","Mastercard","—","Correios","Faturado","—",1,203.95,23.98],["02/07","Vila Velha","ES","Pix","APP_IOS","Flash Delivery","Faturado","CRESCERAPP12",3,70.82,2.97],["02/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",3,75.79,0.0],["02/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,35.29,0.0],["02/07","Teófilo Otoni","MG","Visa","—","Retire em Loja","Cancelado","—",1,164.79,0.0],["02/07","Teófilo Otoni","MG","Visa","—","Retire em Loja","Cancelado","—",1,164.79,0.0],["02/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",1,11.67,0.0],["02/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,38.58,0.0],["02/07","Teófilo Otoni","MG","Visa","—","Retire em Loja","Cancelado","—",1,164.79,0.0],["02/07","Teófilo Otoni","MG","Mastercard","APP_IOS","Flash Delivery","Faturado","CRESCERAPP12",1,87.75,0.0],["02/07","Teófilo Otoni","MG","Mastercard","google","Flash Delivery","Faturado","—",2,129.18,0.0],["02/07","Teófilo Otoni","MG","Visa","—","Retire em Loja","Cancelado","—",1,164.79,0.0],["02/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Cancelado","—",1,116.39,0.0],["02/07","Teófilo Otoni","MG","Visa","APP_ANDROID","Flash Delivery","Faturado","CRESCERAPP12",1,31.41,5.99],["02/07","Vitória","ES","Pix","—","Retire em Loja","Faturado","CRESCERAPP12",1,50.33,0.0],["02/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,16.89,0.0],["02/07","Teófilo Otoni","MG","Mastercard","—","Flash Delivery","Faturado","—",1,138.39,0.0],["02/07","Vila Velha","ES","Pix","—","Flash Delivery","Faturado","—",2,65.98,5.12],["02/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,44.09,0.0],["02/07","Belo Horizonte","MG","Mastercard","—","Correios","Cancelado","—",1,172.37,23.28],["02/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,15.58,0.0],["02/07","Teófilo Otoni","MG","Visa","—","Retire em Loja","Cancelado","—",1,12.99,0.0],["02/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,58.39,0.0],["02/07","Teófilo Otoni","MG","Visa","—","Retire em Loja","Cancelado","—",1,58.99,0.0],["02/07","Teófilo Otoni","MG","Mastercard","APP_IOS","Flash Delivery","Faturado","—",1,100.39,0.0],["02/07","Teófilo Otoni","MG","Visa","—","Retire em Loja","Cancelado","—",4,97.66,0.0],["02/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",1,22.69,0.0],["02/07","Teófilo Otoni","MG","Visa","—","Retire em Loja","Cancelado","—",2,55.98,0.0],["02/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","MARCELLA10",2,38.68,0.0],["02/07","Teófilo Otoni","MG","Visa","—","Retire em Loja","Cancelado","—",4,121.36,0.0],["02/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",3,61.97,0.0],["02/07","Teófilo Otoni","MG","Pix","CEM","Retire em Loja","Faturado","—",1,114.79,0.0],["02/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",3,62.74,4.18],["02/07","Serra","ES","Discover","APP_ANDROID","Correios","Faturado","—",1,140.48,32.3],["02/07","Vila Velha","ES","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,98.99,0.0],["02/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,13.89,0.0],["02/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,30.89,0.0],["02/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",3,9.53,0.0],["02/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",1,169.79,0.0],["02/07","Nanuque","MG","Mastercard","APP_ANDROID","Retire em Loja","Faturado","—",2,122.78,0.0],["02/07","Nanuque","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,46.29,0.0],["02/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",2,122.28,0.0],["02/07","Carlos Chagas","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,28.88,5.99],["02/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,55.9,0.0],["02/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",1,80.77,5.99],["02/07","Teófilo Otoni","MG","Visa","APP_ANDROID","Flash Delivery","Faturado","—",4,85.33,4.07],["02/07","Porto Velho","RO","Visa","—","Correios","Faturado","—",1,57.98,32.6],["02/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","MOTATRI10",1,53.9,0.0],["02/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,23.99,0.0],["02/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,71.95,0.0],["02/07","Vitória","ES","Mastercard","APP_ANDROID","Retire em Loja","Faturado","CRESCERAPP12",2,82.88,0.0],["03/07","Formiga","MG","Mastercard","APP_ANDROID","Correios","Faturado","CRESCERAPP12",1,154.48,23.28],["03/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",2,8.48,0.0],["03/07","Nanuque","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","RANIELLE10",1,31.4,0.0],["03/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,23.09,0.0],["03/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",2,86.77,0.0],["03/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",1,20.37,0.0],["03/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","CRESCERAPP12",1,33.78,0.0],["03/07","Nanuque","MG","Pix","APP_IOS","Flash Delivery","Faturado","RANIELLE10",1,21.5,0.0],["03/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",3,34.96,2.93],["03/07","Teófilo Otoni","MG","Visa","APP_ANDROID","Flash Delivery","Faturado","—",3,116.56,0.0],["03/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,23.56,0.0],["03/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",1,9.38,0.0],["03/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",4,75.96,0.0],["03/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,57.2,0.0],["03/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,36.89,0.0],["03/07","Carlos Chagas","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,39.89,0.0],["03/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",1,55.87,0.0],["03/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",1,23.56,0.0],["03/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,87.63,0.0],["03/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Flash Delivery","Faturado","—",9,416.51,0.0],["03/07","Carlos Chagas","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,119.89,0.0],["03/07","Vila Velha","ES","Pix","APP_IOS","Retire em Loja","Faturado","—",1,43.96,0.0],["03/07","Teófilo Otoni","MG","Mastercard","APP_IOS","Flash Delivery","Faturado","CRESCERAPP12",2,235.14,0.0],["03/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,16.49,0.0],["03/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",2,173.8,0.0],["03/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",3,55.36,0.0],["03/07","São Paulo","SP","Pix","—","Correios","Faturado","—",1,37.89,21.72],["03/07","Teófilo Otoni","MG","Pix","APP_IOS","Flash Delivery","Faturado","—",3,17.86,4.25],["04/07","Nova Lima","MG","Pix","—","Correios","Faturado","—",1,46.93,22.04],["04/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,16.18,0.0],["04/07","Carlos Chagas","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,28.89,0.0],["04/07","Teófilo Otoni","MG","Pix","google","Retire em Loja","Faturado","—",1,39.89,0.0],["04/07","Teófilo Otoni","MG","Visa","APP_IOS","Retire em Loja","Cancelado","—",2,64.18,0.0],["04/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",2,64.18,0.0],["04/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",2,47.99,0.0],["04/07","Serra","ES","Discover","APP_ANDROID","Correios","Cancelado","—",1,619.61,69.62],["04/07","Serra","ES","Discover","APP_ANDROID","Correios","Cancelado","—",1,818.48,71.59],["04/07","Serra","ES","Discover","APP_ANDROID","Correios","Cancelado","—",1,126.53,12.75],["04/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",1,23.78,0.0],["04/07","Carlos Chagas","MG","Pix","—","Retire em Loja","Faturado","—",1,60.99,0.0],["04/07","Vila Velha","ES","Pix","—","Flash Delivery","Faturado","—",3,169.37,0.0],["04/07","Teófilo Otoni","MG","Mastercard","APP_IOS","Flash Delivery","Faturado","—",6,108.12,0.0],["04/07","Carlos Chagas","MG","Pix","—","Retire em Loja","Faturado","—",1,31.29,0.0],["04/07","Teófilo Otoni","MG","Pix","APP_IOS","Flash Delivery","Faturado","—",1,32.38,5.99],["05/07","Santa Luzia","MG","Visa","—","Correios","Faturado","—",3,106.25,15.46],["05/07","Sabará","MG","Pix","—","Correios","Faturado","—",1,312.66,33.76],["05/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,142.89,0.0],["05/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,39.89,0.0],["05/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",1,35.39,0.0],["05/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","maynara10",1,36.8,0.0],["05/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,27.89,0.0],["05/07","Teófilo Otoni","MG","Mastercard","—","Flash Delivery","Faturado","—",1,139.79,0.0],["05/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",2,44.52,0.0],["05/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Flash Delivery","Faturado","—",7,107.77,0.0],["05/07","Teófilo Otoni","MG","Visa","APP_ANDROID","Flash Delivery","Faturado","—",3,56.86,3.2],["05/07","Nanuque","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",2,31.08,0.0],["05/07","Teófilo Otoni","MG","Visa","—","Flash Delivery","Faturado","—",1,52.38,5.99],["05/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",2,46.57,4.28],["05/07","Teófilo Otoni","MG","Pix","APP_IOS","Flash Delivery","Faturado","—",2,33.77,4.94],["05/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,199.78,0.0],["05/07","Nanuque","MG","Pix","—","Flash Delivery","Faturado","—",1,39.89,0.0],["05/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",2,116.68,0.0],["05/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,14.89,0.0],["06/07","Vitória","ES","Mastercard","—","Retire em Loja","Faturado","—",1,179.89,0.0],["06/07","Bady Bassitt","SP","Mastercard","—","Correios","Faturado","—",1,177.6,27.31],["06/07","Carlos Chagas","MG","Visa","APP_IOS","Flash Delivery","Faturado","—",1,117.88,5.99],["06/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,8.37,0.0],["06/07","Teófilo Otoni","MG","Mastercard","—","Flash Delivery","Faturado","—",3,164.17,0.0],["06/07","Vila Velha","ES","Pix","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",2,55.82,0.0],["06/07","Vitória","ES","Mastercard","APP_ANDROID","Retire em Loja","Faturado","CRESCERAPP12",2,40.46,0.0],["06/07","Teófilo Otoni","MG","Visa","—","Retire em Loja","Cancelado","—",5,108.83,14.37],["06/07","Teófilo Otoni","MG","Visa","—","Retire em Loja","Cancelado","—",3,56.67,0.0],["06/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",1,38.88,5.99],["06/07","Teófilo Otoni","MG","Pix","google","Flash Delivery","Faturado","—",3,158.77,0.0],["06/07","Vitória","ES","Pix","APP_ANDROID","Correios","Faturado","CRESCERAPP12",1,44.53,11.98],["06/07","Vitória","ES","Pix","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",1,928.57,0.0],["06/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,10.79,0.0],["06/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","CRESCERAPP12",1,58.34,0.0],["06/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,45.72,0.0],["06/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,574.99,0.0],["06/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Retire em Loja","Cancelado","CRESCERAPP12",7,115.42,0.0],["06/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","CRESCERAPP12",3,58.93,0.0],["06/07","Carlos Chagas","MG","Pix","—","Retire em Loja","Faturado","—",2,38.38,0.0],["06/07","Vitória","ES","Pix","—","Retire em Loja","Faturado","—",3,52.81,0.0],["06/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,33.39,0.0],["06/07","Vitória","ES","Pix","—","Retire em Loja","Faturado","—",2,83.28,0.0],["06/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,11.19,0.0],["06/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,21.57,0.0],["06/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,19.17,0.0],["06/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",3,58.37,0.0],["06/07","Vila Velha","ES","Pix","—","Flash Delivery","Faturado","—",1,87.89,0.0],["06/07","São Paulo","SP","Pix","—","Correios","Faturado","—",1,83.47,26.38],["06/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","CRESCERAPP12",4,96.16,0.0],["06/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,7.69,0.0],["06/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,36.18,0.0],["06/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,23.89,0.0],["06/07","Vila Velha","ES","Visa","—","Flash Delivery","Cancelado","—",1,1443.99,0.0],["06/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",7,87.83,0.0],["06/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",1,40.74,0.0],["06/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",1,18.89,0.0],["06/07","Vila Velha","ES","Visa","—","Correios","Cancelado","—",1,27.66,11.77],["06/07","Vila Velha","ES","Visa","—","Correios","Cancelado","—",1,27.66,11.77],["06/07","Vila Velha","ES","Visa","—","Flash Delivery","Cancelado","—",1,1443.99,0.0],["06/07","Vila Velha","ES","Visa","—","Flash Delivery","Cancelado","—",1,1443.99,0.0],["07/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","CRESCERAPP12",2,37.47,0.0],["07/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,20.89,0.0],["07/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",1,5.98,0.0],["07/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","MARCELLA10",2,105.46,0.0],["07/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",2,45.28,0.0],["07/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",5,55.35,0.0],["07/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,39.89,0.0],["07/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,85.78,0.0],["07/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",1,52.89,0.0],["07/07","Teófilo Otoni","MG","Pix","ig","Flash Delivery","Faturado","MARCELLA10",7,100.28,0.0],["07/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,17.77,5.99],["07/07","Carlos Chagas","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,27.99,0.0],["07/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","MOTATRI10",1,6.2,0.0],["07/07","Teófilo Otoni","MG","Visa","APP_ANDROID","Flash Delivery","Faturado","—",6,182.24,0.0],["07/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Flash Delivery","Faturado","—",6,184.14,0.0],["07/07","Nanuque","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",3,19.46,0.0],["07/07","Teófilo Otoni","MG","Discover","APP_ANDROID","Flash Delivery","Faturado","—",3,67.78,2.52],["07/07","Teófilo Otoni","MG","Visa","APP_ANDROID","Correios","Faturado","RANIELLE10",2,102.05,19.83],["07/07","Carlos Chagas","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","CRESCERAPP12",1,21.9,0.0],["07/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",1,79.45,0.0],["07/07","Vila Velha","ES","Visa","—","Flash Delivery","Cancelado","—",1,1443.99,0.0],["07/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",1,13.19,0.0],["07/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","MOTATRI10",1,18.53,0.0],["07/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,13.78,0.0],["07/07","Teófilo Otoni","MG","Mastercard","—","Flash Delivery","Faturado","—",3,98.42,0.0],["07/07","Nanuque","MG","Visa","APP_ANDROID","Retire em Loja","Faturado","CRESCERAPP12",1,252.82,0.0],["07/07","Vila Velha","ES","Pix","APP_ANDROID","Flash Delivery","Faturado","—",4,182.56,0.0],["07/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,29.89,0.0],["07/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Cancelado","CRESCERAPP12",1,68.9,5.99],["07/07","Vila Velha","ES","Visa","—","Flash Delivery","Cancelado","—",1,1443.99,0.0],["07/07","Teófilo Otoni","MG","Pix","APP_IOS","Flash Delivery","Faturado","—",2,49.77,3.43],["07/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,1422.39,0.0],["07/07","Vila Velha","ES","Visa","—","Flash Delivery","Cancelado","—",1,1443.99,0.0],["07/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,88.49,0.0],["07/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,88.49,0.0],["07/07","Vila Velha","ES","Visa","—","Flash Delivery","Cancelado","—",1,1443.99,0.0],["07/07","Teófilo Otoni","MG","Mastercard","—","Retire em Loja","Cancelado","—",1,71.56,0.0],["07/07","Teófilo Otoni","MG","Visa","—","Retire em Loja","Cancelado","—",1,71.56,0.0],["07/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",3,135.37,0.0],["07/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,9.79,0.0],["07/07","Vila Velha","ES","Mastercard","APP_ANDROID","Flash Delivery","Faturado","—",1,239.34,0.0],["08/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","MARCELLA10",1,74.6,0.0],["08/07","Vitória","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,74.96,0.0],["08/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",2,27.58,0.0],["08/07","Vila Velha","ES","Pix","—","Flash Delivery","Faturado","—",1,187.78,0.0],["08/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,26.79,0.0],["08/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",1,24.99,0.0],["08/07","Carlos Chagas","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","CRESCERAPP12",1,31.58,0.0],["08/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",3,59.9,0.0],["08/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","CRESCERAPP12",3,59.9,0.0],["08/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,50.98,0.0],["08/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,67.78,0.0],["08/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",1,19.88,5.99],["08/07","Teófilo Otoni","MG","Mastercard","APP_IOS","Retire em Loja","Cancelado","—",2,66.88,0.0],["08/07","Nova Iguaçu","RJ","Pix","—","Correios","Faturado","—",1,56.9,21.91],["08/07","Teófilo Otoni","MG","Mastercard","—","Flash Delivery","Faturado","—",2,106.78,0.0],["08/07","Vitória","ES","Pix","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",5,109.92,0.0],["08/07","Vila Velha","ES","Visa","—","Correios","Cancelado","—",1,798.71,38.82],["08/07","Teófilo Otoni","MG","Visa","—","Retire em Loja","Cancelado","—",1,12.89,0.0],["08/07","Teófilo Otoni","MG","Pix","APP_IOS","Flash Delivery","Faturado","CRESCERAPP12",1,98.9,0.0],["08/07","Vila Velha","ES","Visa","—","Correios","Cancelado","—",1,798.71,38.82],["08/07","Teófilo Otoni","MG","Visa","APP_ANDROID","Retire em Loja","Cancelado","—",2,59.58,0.0],["08/07","Vila Velha","ES","Visa","—","Flash Delivery","Cancelado","—",1,23.88,5.99],["08/07","Vila Velha","ES","Visa","—","Correios","Cancelado","—",1,798.71,38.82],["08/07","Vila Velha","ES","Visa","—","Correios","Cancelado","—",1,798.71,38.82],["08/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,58.39,0.0],["08/07","Nanuque","MG","Pix","—","Retire em Loja","Faturado","—",1,33.78,0.0],["08/07","Vila Velha","ES","Pix","APP_IOS","Retire em Loja","Faturado","—",1,1.39,0.0],["08/07","Vila Velha","ES","Visa","—","Correios","Cancelado","—",1,798.71,38.82],["08/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",2,35.67,3.0],["08/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",2,83.07,5.13],["08/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",2,17.27,0.0],["08/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,40.88,5.99],["08/07","Vila Velha","ES","Mastercard","APP_IOS","Flash Delivery","Faturado","CRESCERAPP12",3,104.08,0.0],["08/07","Jaboatão dos Guararapes","PE","Mastercard","—","Correios","Faturado","—",1,339.54,74.65],["09/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,23.78,0.0],["09/07","Teófilo Otoni","MG","Mastercard","—","Flash Delivery","Faturado","—",1,134.49,0.0],["09/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","CRESCERAPP12",5,404.22,0.0],["09/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",3,45.82,0.0],["09/07","VILA VELHA","ES","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,77.95,5.99],["09/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,103.78,0.0],["09/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","CRESCERAPP12",1,263.7,0.0],["09/07","Teófilo Otoni","MG","Pix","google","Retire em Loja","Faturado","MARCELLA10",1,17.09,0.0],["09/07","Vila Velha","ES","Pix","APP_IOS","Retire em Loja","Faturado","—",3,34.27,0.0],["09/07","Vila Velha","ES","Mastercard","APP_ANDROID","Retire em Loja","Cancelado","—",10,384.17,0.0],["09/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",3,40.0,4.11],["09/07","Nanuque","MG","Pix","APP_IOS","Flash Delivery","Faturado","CRESCERAPP12",6,241.52,0.0],["09/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Flash Delivery","Faturado","—",3,195.23,0.0],["09/07","Teófilo Otoni","MG","Visa","APP_ANDROID","Retire em Loja","Cancelado","—",1,61.09,0.0],["09/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,54.08,0.0],["09/07","Vila Velha","ES","Pix","—","Flash Delivery","Faturado","—",1,85.44,5.99],["09/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","CRESCERAPP12",1,53.76,0.0],["09/07","Vila Velha","ES","Pix","APP_IOS","Retire em Loja","Faturado","RANIELLE10",3,63.15,0.0],["09/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,19.78,0.0],["09/07","Vitória","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,55.78,0.0],["09/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","CRESCERAPP12",1,10.64,0.0],["09/07","Nanuque","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",2,37.78,0.0],["09/07","Carlos Chagas","MG","Mastercard","APP_ANDROID","Flash Delivery","Faturado","—",1,99.89,0.0],["09/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",2,26.04,5.84],["09/07","Carlos Chagas","MG","Pix","—","Retire em Loja","Faturado","—",2,34.27,0.0],["09/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",2,59.38,0.0],["09/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",2,49.27,0.0],["09/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,26.79,0.0],["09/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","CRESCERAPP12",1,53.76,0.0],["09/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,81.18,0.0],["09/07","São Paulo","SP","Visa","—","Correios","Cancelado","—",1,789.05,29.16],["09/07","Vitória","ES","Pix","APP_IOS","Retire em Loja","Faturado","—",3,22.34,0.0],["09/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,71.88,0.0],["09/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",1,328.89,0.0],["09/07","São Paulo","SP","Pix","APP_ANDROID","Correios","Faturado","—",1,120.72,22.54],["09/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",1,45.4,0.0],["09/07","Teófilo Otoni","MG","Pix","—","Correios","Faturado","—",3,211.79,15.9],["10/07","Curitiba","PR","Visa","—","Correios","Faturado","—",1,498.06,26.28],["10/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",1,37.88,5.99],["10/07","Vila Velha","ES","Visa","—","Flash Delivery","Faturado","—",1,96.59,0.0],["10/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,20.93,0.0],["10/07","Teófilo Otoni","MG","Mastercard","APP_IOS","Flash Delivery","Faturado","—",1,152.89,0.0],["10/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,58.39,0.0],["10/07","Teófilo Otoni","MG","Pix","APP_IOS","Flash Delivery","Faturado","—",1,49.88,5.99],["10/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,16.18,0.0],["10/07","Carlos Chagas","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","CRESCERAPP12",1,50.06,0.0],["10/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",1,129.89,0.0],["10/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,65.07,0.0],["10/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,333.39,0.0],["10/07","Vila Velha","ES","Mastercard","—","Flash Delivery","Faturado","—",1,44.06,5.99],["10/07","Curitiba","PR","Visa","—","Correios","Faturado","—",1,219.71,23.52],["10/07","Vitória","ES","Pix","—","Retire em Loja","Faturado","—",2,7.98,0.0],["10/07","Nanuque","MG","Visa","APP_ANDROID","Retire em Loja","Faturado","—",1,119.89,0.0],["10/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",2,8.88,0.0],["10/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","MOTATRI10",1,15.83,0.0],["10/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",2,135.5,0.0],["10/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,27.38,0.0],["10/07","Carlos Chagas","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,39.89,0.0],["10/07","Vila Velha","ES","Visa","—","Flash Delivery","Cancelado","—",1,1637.39,0.0],["10/07","Teófilo Otoni","MG","Visa","APP_ANDROID","Retire em Loja","Cancelado","—",1,39.89,0.0],["10/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,16.79,0.0],["10/07","Teófilo Otoni","MG","Visa","APP_ANDROID","Retire em Loja","Cancelado","—",1,39.89,0.0],["10/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Retire em Loja","Cancelado","—",1,39.89,0.0],["10/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,36.1,0.0],["10/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,160.79,0.0],["10/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,6.89,0.0],["10/07","Teófilo Otoni","MG","Mastercard","—","Flash Delivery","Faturado","—",6,418.44,0.0],["10/07","Nanuque","MG","Pix","—","Retire em Loja","Faturado","CRESCERAPP12",4,94.12,0.0],["10/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,19.89,0.0],["10/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",3,75.87,0.0],["11/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",2,30.98,0.0],["11/07","Teófilo Otoni","MG","Visa","—","Flash Delivery","Faturado","—",1,82.09,0.0],["11/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,43.88,5.99],["11/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,36.48,0.0],["11/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Cancelado","—",4,52.04,0.0],["11/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,14.89,0.0],["11/07","Vila Velha","ES","Pix","APP_IOS","Retire em Loja","Faturado","—",1,43.96,0.0],["11/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","CRESCERAPP12",8,181.9,0.0],["11/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,30.09,0.0],["11/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,21.78,0.0],["11/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,33.58,0.0],["11/07","Teófilo Otoni","MG","Mastercard","—","Flash Delivery","Faturado","—",1,75.88,5.99],["11/07","Teófilo Otoni","MG","Visa","APP_ANDROID","Flash Delivery","Faturado","—",2,39.57,3.86],["11/07","Carlos Chagas","MG","Mastercard","APP_IOS","Flash Delivery","Faturado","—",8,106.12,0.0],["11/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,31.89,0.0],["11/07","Vitória","ES","Pix","APP_IOS","Flash Delivery","Faturado","—",1,251.29,0.0],["11/07","Vitória","ES","Pix","APP_ANDROID","Flash Delivery","Faturado","—",2,41.77,3.12],["11/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,79.78,0.0],["11/07","Nanuque","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","RANIELLE10",1,39.23,0.0],["11/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",3,24.87,0.0],["11/07","Alfenas","MG","Visa","—","Correios","Faturado","—",1,212.63,45.25],["11/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,9.69,0.0],["11/07","Teófilo Otoni","MG","Pix","APP_IOS","Flash Delivery","Faturado","—",1,15.08,5.99],["11/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,21.89,0.0],["11/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,28.89,0.0],["11/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",2,29.07,3.19],["12/07","São Paulo","SP","Pix","—","Correios","Faturado","—",1,95.48,43.64],["12/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Flash Delivery","Faturado","RANIELLE10",2,211.84,0.0],["12/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",3,55.87,0.0],["12/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","CRESCERAPP12",1,67.58,0.0],["12/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,18.99,0.0],["12/07","Teófilo Otoni","MG","Mastercard","—","Flash Delivery","Faturado","—",2,85.78,0.0],["12/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,250.79,0.0],["12/07","Vila Velha","ES","Pix","APP_IOS","Flash Delivery","Faturado","—",1,28.88,5.99],["12/07","Teófilo Otoni","MG","Pix","APP_IOS","Flash Delivery","Faturado","—",2,41.67,4.79],["12/07","Teófilo Otoni","MG","Visa","APP_IOS","Flash Delivery","Faturado","—",1,86.29,0.0],["12/07","Carlos Chagas","MG","Mastercard","APP_IOS","Flash Delivery","Faturado","CRESCERAPP12",2,59.56,0.0],["12/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","CRESCERAPP12",1,48.57,0.0],["12/07","Teófilo Otoni","MG","Discover","APP_IOS","Flash Delivery","Faturado","—",1,22.88,5.99],["12/07","Vitória","ES","Pix","APP_IOS","Retire em Loja","Faturado","RANIELLE10",2,31.39,0.0],["13/07","São Paulo","SP","Visa","APP_IOS","Correios","Faturado","CRESCERAPP12",1,78.21,26.39],["13/07","Vitória","ES","Pix","APP_IOS","Retire em Loja","Faturado","—",1,43.96,0.0],["13/07","Teófilo Otoni","MG","Visa","APP_ANDROID","Flash Delivery","Faturado","—",1,171.56,0.0],["13/07","Teófilo Otoni","MG","Pix","CEM","Retire em Loja","Faturado","MOTATRI10",2,53.79,0.0],["13/07","Vitória","ES","Visa","APP_ANDROID","Retire em Loja","Faturado","—",3,108.56,0.0],["13/07","Teófilo Otoni","MG","Mastercard","APP_IOS","Flash Delivery","Faturado","CRESCERAPP12",2,92.56,0.0],["13/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,12.99,0.0],["13/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","MARCELLA10",1,19.07,0.0],["13/07","Vila Velha","ES","Mastercard","APP_IOS","Flash Delivery","Faturado","—",1,109.7,0.0],["13/07","Teófilo Otoni","MG","Pix","APP_IOS","Flash Delivery","Faturado","—",1,10.68,5.99],["13/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Flash Delivery","Faturado","—",1,20.88,5.99],["13/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",3,38.96,3.52],["13/07","Porto Velho","RO","Pix","—","Correios","Faturado","—",1,54.13,32.57],["13/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",2,12.58,0.0],["13/07","Carlos Chagas","MG","Pix","—","Retire em Loja","Faturado","—",1,79.78,0.0],["13/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,15.45,0.0],["13/07","São Paulo","SP","Pix","—","Correios","Faturado","—",1,325.69,97.33],["13/07","Vila Velha","ES","Pix","APP_IOS","Retire em Loja","Faturado","—",1,26.38,0.0],["13/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Flash Delivery","Faturado","—",1,134.99,0.0],["13/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","MARCELLA10",5,178.32,0.0],["13/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,7.89,0.0],["13/07","Nanuque","MG","Pix","ig","Flash Delivery","Faturado","—",1,22.79,0.0],["13/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,107.28,0.0],["13/07","Teófilo Otoni","MG","Mastercard","—","Flash Delivery","Faturado","—",2,271.96,0.0],["13/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,10.68,0.0],["13/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",2,76.47,0.0],["13/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,29.58,0.0],["13/07","Teófilo Otoni","MG","Visa","—","Retire em Loja","Cancelado","—",2,63.78,0.0],["13/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","CRESCERAPP12",4,61.72,0.0],["13/07","Campinas","SP","Pix","—","Correios","Faturado","CRESCERAPP12",1,135.27,32.85],["14/07","Teófilo Otoni","MG","Visa","APP_ANDROID","Retire em Loja","Cancelado","—",3,470.45,0.0],["14/07","Teófilo Otoni","MG","Visa","APP_ANDROID","Retire em Loja","Cancelado","—",1,363.56,0.0],["14/07","Teófilo Otoni","MG","Visa","APP_ANDROID","Flash Delivery","Faturado","—",2,157.58,0.0],["14/07","Vila Velha","ES","Pix","—","Flash Delivery","Faturado","—",1,20.57,5.99],["14/07","Teófilo Otoni","MG","Mastercard","—","Retire em Loja","Cancelado","—",3,74.67,0.0],["14/07","Teófilo Otoni","MG","Mastercard","APP_IOS","Flash Delivery","Faturado","—",4,165.85,0.0],["14/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",1,13.68,5.99],["14/07","Vila Velha","ES","Pix","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",1,10.72,0.0],["14/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,89.27,0.0],["14/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",2,23.28,0.0],["14/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","MARCELLA10",1,25.19,0.0],["14/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,35.49,0.0],["14/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,28.39,0.0],["14/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","CRESCERAPP12",2,79.78,0.0],["14/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,129.89,0.0],["14/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","MOTATRI10",3,67.2,0.0],["14/07","Itapira","SP","Pix","—","Correios","Faturado","—",1,96.7,26.51],["14/07","Vila Velha","ES","Pix","—","Flash Delivery","Faturado","—",1,84.57,0.0],["14/07","Teófilo Otoni","MG","Pix","APP_IOS","Flash Delivery","Faturado","MARCELLA10",1,50.26,5.99],["14/07","São Paulo","SP","Mastercard","—","Correios","Faturado","—",1,88.0,22.22],["14/07","Teófilo Otoni","MG","Pix","google","Retire em Loja","Faturado","—",1,33.99,0.0],["14/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,7.79,0.0],["14/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",2,37.64,0.0],["14/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",1,28.68,5.99],["14/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Flash Delivery","Faturado","—",4,83.83,3.82],["14/07","Teófilo Otoni","MG","Mastercard","—","Flash Delivery","Faturado","—",2,152.28,0.0],["14/07","Frederico Westphalen","RS","Visa","—","Correios","Cancelado","CRESCERAPP12",1,81.64,31.78],["14/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,28.89,0.0],["14/07","Ibirité","MG","Pix","—","Correios","Faturado","—",1,44.2,31.81],["14/07","Vila Velha","ES","Pix","APP_IOS","Retire em Loja","Faturado","—",1,17.89,0.0],["15/07","Nanuque","MG","Pix","APP_IOS","Flash Delivery","Faturado","RANIELLE10",1,44.9,0.0],["15/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Flash Delivery","Faturado","—",4,135.16,0.0],["15/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,27.99,0.0],["15/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Flash Delivery","Cancelado","CRESCERAPP12",5,117.86,0.0],["15/07","Nanuque","MG","Elo","—","Flash Delivery","Faturado","—",2,144.08,0.0],["15/07","Nanuque","MG","Pix","APP_IOS","Flash Delivery","Faturado","—",2,30.88,0.0],["15/07","Vitória","ES","Mastercard","APP_ANDROID","Retire em Loja","Faturado","—",3,60.17,0.0],["15/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Flash Delivery","Faturado","CRESCERAPP12",2,95.99,0.0],["15/07","Teófilo Otoni","MG","Mastercard","—","Retire em Loja","Cancelado","CRESCERAPP12",1,121.52,0.0],["15/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Flash Delivery","Cancelado","CRESCERAPP12",1,121.52,0.0],["15/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,13.89,0.0],["15/07","Vila Velha","ES","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,80.29,0.0],["15/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",1,38.69,0.0],["15/07","Vila Velha","ES","Pix","—","Flash Delivery","Faturado","CRESCERAPP12",1,72.77,5.99],["15/07","Teófilo Otoni","MG","Visa","APP_ANDROID","Flash Delivery","Faturado","—",1,69.97,5.99],["15/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Cancelado","—",1,104.99,0.0],["15/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,44.97,0.0],["15/07","São Paulo","SP","Visa","—","Correios","Cancelado","—",1,40.13,21.74],["15/07","Nanuque","MG","Mastercard","—","Flash Delivery","Faturado","—",1,70.09,0.0],["15/07","Embu-Guaçu","SP","Mastercard","APP_IOS","Correios","Cancelado","CRESCERAPP12",1,287.8,20.68],["15/07","Carlos Chagas","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",4,123.46,0.0],["15/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Retire em Loja","Cancelado","CRESCERAPP12",6,233.92,0.0],["15/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Retire em Loja","Cancelado","CRESCERAPP12",6,233.92,0.0],["15/07","Teófilo Otoni","MG","Mastercard","google","Flash Delivery","Cancelado","CRESCERAPP12",6,233.92,0.0],["15/07","Santos","SP","Visa","—","Correios","Cancelado","—",1,100.62,50.72],["15/07","Teófilo Otoni","MG","Mastercard","CEM","Flash Delivery","Cancelado","CRESCERAPP12",6,233.92,0.0],["15/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Flash Delivery","Cancelado","—",1,76.08,5.99],["15/07","Mallet","PR","Visa","—","Correios","Faturado","—",1,90.28,26.44],["16/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,19.79,0.0],["16/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",1,41.59,0.0],["16/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,46.47,0.0],["16/07","Nanuque","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,7.49,0.0],["16/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",3,159.97,0.0],["16/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",3,15.52,0.0],["16/07","Brasília","DF","Elo","—","Correios","Faturado","—",1,76.2,26.3],["16/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,17.19,0.0],["16/07","Serra","ES","Pix","APP_ANDROID","Correios","Faturado","—",6,94.41,8.11],["16/07","Vila Velha","ES","Pix","APP_IOS","Retire em Loja","Faturado","—",1,29.89,0.0],["16/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",3,27.75,3.82],["16/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,9.79,0.0],["16/07","Teófilo Otoni","MG","Pix","APP_IOS","Flash Delivery","Faturado","—",1,487.45,0.0],["16/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,5.89,0.0],["16/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",1,15.89,0.0],["16/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,28.38,0.0],["16/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",2,50.87,0.0],["16/07","Vila Velha","ES","Pix","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",2,21.8,0.0],["16/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",2,27.37,5.66],["16/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",2,47.56,5.84],["16/07","Campo Belo","MG","Pix","APP_ANDROID","Correios","Faturado","CRESCERAPP12",1,193.43,21.03],["16/07","Maceió","AL","Visa","—","Correios","Faturado","—",1,125.06,25.17],["16/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,15.98,0.0],["17/07","Vila Velha","ES","Pix","APP_IOS","Retire em Loja","Faturado","—",1,43.96,0.0],["17/07","Vila Velha","ES","Pix","APP_IOS","Retire em Loja","Faturado","—",1,43.96,0.0],["17/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,6.89,0.0],["17/07","Teófilo Otoni","MG","Mastercard","—","Flash Delivery","Faturado","—",8,329.05,0.0],["17/07","Vitória","ES","Mastercard","APP_ANDROID","Retire em Loja","Faturado","—",1,40.89,0.0],["17/07","Teófilo Otoni","MG","Pix","google","Retire em Loja","Faturado","MARCELLA10",1,8.0,0.0],["17/07","Vila Velha","ES","Pix","APP_IOS","Retire em Loja","Faturado","—",3,407.94,0.0],["17/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,8.09,0.0],["17/07","Vitória","ES","Mastercard","APP_ANDROID","Retire em Loja","Faturado","—",1,27.76,0.0],["17/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",2,16.38,0.0],["17/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",1,32.71,5.99],["17/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,14.67,0.0],["17/07","Nanuque","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","CRESCERAPP12",4,61.4,0.0],["17/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,49.89,0.0],["17/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",4,58.99,0.0],["17/07","Vila Velha","ES","Pix","—","Flash Delivery","Cancelado","—",6,171.6,0.0],["17/07","Carlos Chagas","MG","Pix","—","Retire em Loja","Faturado","lidiomar10",1,68.3,0.0],["17/07","Vila Velha","ES","Mastercard","APP_ANDROID","Flash Delivery","Faturado","CRESCERAPP12",3,181.5,0.0],["17/07","Vitória","ES","Pix","APP_IOS","Retire em Loja","Faturado","—",5,104.42,0.0],["17/07","Carlos Chagas","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,13.99,0.0],["17/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",1,20.69,0.0],["17/07","Vila Velha","ES","Pix","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",4,50.13,0.0],["17/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,13.89,0.0],["17/07","Teófilo Otoni","MG","Mastercard","APP_IOS","Retire em Loja","Cancelado","CRESCERAPP12",3,95.89,0.0],["17/07","Carlos Chagas","MG","Pix","—","Retire em Loja","Faturado","CRESCERAPP12",1,116.15,0.0],["17/07","Carlos Chagas","MG","Mastercard","APP_ANDROID","Retire em Loja","Faturado","—",1,36.49,0.0],["17/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",3,95.89,0.0],["17/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,10.14,0.0],["17/07","Nanuque","MG","Mastercard","APP_ANDROID","Flash Delivery","Faturado","CRESCERAPP12",3,91.39,0.0],["17/07","Teófilo Otoni","MG","Mastercard","—","Retire em Loja","Cancelado","MARCELLA10",2,100.61,0.0],["17/07","Teófilo Otoni","MG","Mastercard","—","Retire em Loja","Cancelado","MARCELLA10",2,100.61,0.0],["17/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","CRESCERAPP12",1,92.31,0.0],["17/07","Vila Velha","ES","Pix","chatgpt.com","Flash Delivery","Faturado","—",1,33.56,5.99],["17/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,6.89,0.0],["17/07","Teófilo Otoni","MG","Pix","APP_IOS","Flash Delivery","Faturado","—",1,32.18,5.99],["18/07","Teófilo Otoni","MG","Mastercard","—","Flash Delivery","Faturado","—",3,162.77,0.0],["18/07","Nanuque","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","RANIELLE10",3,30.21,0.0],["18/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","MARCELLA10",2,173.59,0.0],["18/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,15.47,0.0],["18/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","MARCELLA10",1,76.4,0.0],["18/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",7,127.43,0.0],["18/07","Nanuque","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",6,98.44,0.0],["18/07","Teófilo Otoni","MG","Mastercard","APP_IOS","Flash Delivery","Cancelado","—",1,88.78,0.0],["18/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",1,28.89,0.0],["18/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",3,91.67,0.0],["18/07","Carlos Chagas","MG","Mastercard","—","Retire em Loja","Faturado","—",1,60.89,0.0],["18/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","MARCELLA10",1,8.9,0.0],["18/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",2,16.87,5.8],["18/07","Vila Velha","ES","Pix","APP_IOS","Retire em Loja","Faturado","—",2,14.56,0.0],["18/07","Carlos Chagas","MG","Pix","—","Retire em Loja","Faturado","—",3,60.97,0.0],["18/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Cancelado","—",1,47.98,0.0],["18/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",1,88.49,0.0],["18/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,49.15,0.0],["18/07","Vila Velha","ES","Mastercard","—","Flash Delivery","Faturado","—",1,265.47,0.0],["18/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,135.36,0.0],["18/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,19.89,0.0],["18/07","Porto Alegre","RS","Pix","—","Correios","Faturado","—",1,32.45,21.67],["18/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,11.99,0.0],["19/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,21.88,5.99],["19/07","Nanuque","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,119.89,0.0],["19/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",1,979.78,0.0],["19/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",1,979.78,0.0],["19/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","CRESCERAPP12",1,72.33,5.99],["19/07","Nanuque","MG","Pix","CEM","Flash Delivery","Faturado","—",2,56.38,0.0],["19/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,21.88,0.0],["19/07","Nanuque","MG","Visa","—","Retire em Loja","Faturado","—",4,228.72,0.0],["19/07","Teófilo Otoni","MG","Mastercard","APP_IOS","Flash Delivery","Faturado","—",1,99.79,0.0],["19/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",2,86.68,0.0],["19/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,13.29,0.0],["19/07","Teófilo Otoni","MG","Mastercard","—","Flash Delivery","Faturado","—",1,56.38,5.99],["19/07","Vitória","ES","Mastercard","—","Retire em Loja","Faturado","—",1,56.18,0.0],["19/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,7.9,0.0],["19/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,39.38,0.0],["20/07","Nanuque","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,22.38,5.99],["20/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,14.19,0.0],["20/07","Teófilo Otoni","MG","Mastercard","APP_IOS","Flash Delivery","Faturado","—",4,138.94,0.0],["20/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",3,17.57,0.0],["20/07","Teófilo Otoni","MG","Mastercard","—","Flash Delivery","Faturado","crescer15",4,236.66,0.0],["20/07","São Paulo","SP","Mastercard","—","Correios","Cancelado","—",1,242.72,65.14],["20/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","RANIELLE10",3,72.87,0.0],["20/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",1,27.38,0.0],["20/07","Vila Velha","ES","Visa","—","Flash Delivery","Faturado","—",1,83.79,5.99],["20/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",6,56.2,0.0],["20/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","CRESCERAPP12",4,148.31,0.0],["20/07","Carlos Chagas","MG","Pix","—","Retire em Loja","Faturado","—",1,20.69,0.0],["20/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",1,40.79,0.0],["20/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",1,30.79,0.0],["20/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",4,127.26,0.0],["20/07","Nanuque","MG","Mastercard","—","Flash Delivery","Faturado","—",2,51.34,0.0],["20/07","Carlos Chagas","MG","Mastercard","APP_IOS","Retire em Loja","Faturado","RANIELLE10",1,15.2,0.0],["20/07","Vitória","ES","Visa","APP_ANDROID","Retire em Loja","Faturado","CRESCERAPP12",2,70.16,0.0],["20/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",1,59.74,0.0],["20/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",1,41.78,0.0],["20/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","CRESCERAPP12",2,129.08,0.0],["20/07","Teófilo Otoni","MG","Visa","APP_ANDROID","Flash Delivery","Faturado","—",3,58.95,3.57],["20/07","Vila Velha","ES","Pix","APP_ANDROID","Flash Delivery","Faturado","CRESCERAPP12",2,110.16,0.0],["20/07","São Mateus do Sul","PR","Pix","APP_ANDROID","Correios","Faturado","—",1,46.95,31.37],["20/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",1,4.59,0.0],["20/07","Teófilo Otoni","MG","Visa","—","Flash Delivery","Faturado","—",1,11.88,5.99],["20/07","Teófilo Otoni","MG","Visa","—","Flash Delivery","Faturado","—",2,102.68,0.0],["20/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,31.28,0.0],["21/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",3,199.35,0.0],["21/07","Vila Velha","ES","Pix","—","Flash Delivery","Faturado","—",1,19.77,5.99],["21/07","Nanuque","MG","Pix","APP_IOS","Flash Delivery","Faturado","RANIELLE10",1,21.84,0.0],["21/07","Vila Velha","ES","Visa","—","Flash Delivery","Faturado","—",1,290.0,0.0],["21/07","Nanuque","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","CRESCERAPP12",2,26.03,0.0],["21/07","Teófilo Otoni","MG","Mastercard","—","Flash Delivery","Faturado","—",6,251.79,0.0],["21/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",1,31.18,0.0],["21/07","Vitória","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,11.07,0.0],["21/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","MARCELLA10",1,134.27,0.0],["21/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,11.78,0.0],["21/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",1,50.33,0.0],["21/07","Ouro Preto","MG","Visa","APP_ANDROID","Correios","Faturado","CRESCERAPP12",5,453.64,10.39],["21/07","Vila Velha","ES","Pix","—","Flash Delivery","Faturado","—",1,187.78,0.0],["21/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",2,50.47,0.0],["21/07","Teófilo Otoni","MG","Mastercard","APP_IOS","Flash Delivery","Faturado","—",2,63.55,4.49],["21/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,139.59,0.0],["21/07","Carlos Chagas","MG","Pix","—","Retire em Loja","Faturado","—",1,124.89,0.0],["21/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,21.78,0.0],["21/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",3,22.75,3.05],["21/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,4.68,0.0],["21/07","Vila Velha","ES","Pix","APP_IOS","Retire em Loja","Faturado","—",3,41.77,0.0],["21/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Cancelado","—",2,77.88,0.0],["21/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",3,36.66,0.0],["21/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,24.57,0.0],["21/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","CRESCERAPP12",1,197.9,0.0],["21/07","Teófilo Otoni","MG","Pix","CEM","Correios","Faturado","—",1,152.6,13.01],["21/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",2,74.87,0.0],["21/07","Vitória","ES","Mastercard","APP_ANDROID","Retire em Loja","Faturado","—",2,62.08,0.0],["21/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,97.98,0.0],["21/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",1,13.88,5.99],["22/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",3,26.67,0.0],["22/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","RANIELLE10",1,11.96,0.0],["22/07","Teófilo Otoni","MG","Mastercard","google","Flash Delivery","Faturado","—",1,136.79,0.0],["22/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",2,53.18,0.0],["22/07","Vila Velha","ES","Mastercard","APP_ANDROID","Retire em Loja","Cancelado","—",1,144.99,0.0],["22/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,42.56,0.0],["22/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,86.83,0.0],["22/07","Rio Azul","PR","Pix","—","Correios","Faturado","—",1,184.52,32.74],["22/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",3,70.57,0.0],["22/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",1,24.88,5.99],["22/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",2,31.78,0.0],["22/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,45.87,0.0],["22/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,26.89,0.0],["22/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",2,55.07,0.0],["22/07","Vitória","ES","Pix","—","Retire em Loja","Faturado","—",1,3.49,0.0],["22/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Flash Delivery","Faturado","CRESCERAPP12",3,165.59,0.0],["22/07","Vitória","ES","Mastercard","APP_ANDROID","Retire em Loja","Faturado","—",1,7.89,0.0],["22/07","Teófilo Otoni","MG","Visa","APP_ANDROID","Flash Delivery","Faturado","—",1,97.98,0.0],["22/07","Vila Velha","ES","Visa","—","Flash Delivery","Faturado","—",1,89.67,0.0],["22/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",3,55.96,2.9],["22/07","Teófilo Otoni","MG","Pix","CEM","Retire em Loja","Faturado","—",1,23.78,0.0],["22/07","Carlos Chagas","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","CRESCERAPP12",1,24.54,0.0],["22/07","Carlos Chagas","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,13.59,0.0],["22/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",1,269.79,0.0],["22/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,2.79,0.0],["22/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,34.73,5.99],["22/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,23.78,0.0],["22/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,17.68,5.99],["22/07","Vila Velha","ES","Pix","—","Flash Delivery","Faturado","—",1,29.88,5.99],["22/07","Vila Velha","ES","Mastercard","APP_IOS","Flash Delivery","Faturado","—",3,106.65,0.0],["22/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,53.89,0.0],["22/07","Teófilo Otoni","MG","Mastercard","—","Flash Delivery","Faturado","—",1,82.89,0.0],["22/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,11.89,0.0],["22/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",1,26.89,0.0],["22/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,11.89,0.0],["22/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",2,25.95,4.49],["22/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","vivi10",4,16.33,0.0],["23/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",2,19.16,0.0],["23/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,13.18,0.0],["23/07","Nanuque","MG","Visa","APP_ANDROID","Flash Delivery","Faturado","—",4,66.46,0.0],["23/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Flash Delivery","Faturado","—",1,74.98,5.99],["23/07","Teófilo Otoni","MG","Mastercard","—","Flash Delivery","Faturado","—",1,203.39,0.0],["23/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",2,36.57,0.0],["23/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,6.09,0.0],["23/07","São José dos Campos","SP","Pix","—","Correios","Cancelado","—",1,149.27,41.49],["23/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",5,49.71,0.0],["23/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,13.19,0.0],["23/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",2,30.28,0.0],["23/07","Nanuque","MG","Visa","APP_ANDROID","Flash Delivery","Faturado","—",4,190.06,0.0],["23/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,19.59,0.0],["23/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",1,29.39,0.0],["23/07","Teófilo Otoni","MG","Pix","APP_IOS","Flash Delivery","Faturado","—",2,36.77,5.21],["23/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","CRESCERAPP12",1,14.07,0.0],["23/07","Teófilo Otoni","MG","Mastercard","APP_IOS","Flash Delivery","Faturado","—",3,177.85,0.0],["23/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",2,33.97,3.42],["23/07","Teófilo Otoni","MG","Pix","CEM","Retire em Loja","Faturado","—",1,15.98,0.0],["23/07","Teófilo Otoni","MG","Pix","CEM","Retire em Loja","Faturado","—",3,71.67,0.0],["23/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",1,10.88,5.99],["23/07","Vila Velha","ES","Pix","APP_ANDROID","Flash Delivery","Faturado","—",3,36.36,5.09],["23/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",2,145.84,0.0],["23/07","Nanuque","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,23.98,0.0],["23/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,35.78,0.0],["23/07","São Paulo","SP","Pix","—","Correios","Faturado","—",1,59.83,31.96],["24/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Cancelado","—",4,10.86,0.0],["24/07","Vitória","ES","Mastercard","APP_ANDROID","Retire em Loja","Faturado","—",6,218.56,0.0],["24/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",5,17.55,0.0],["24/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,10.79,0.0],["24/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Flash Delivery","Faturado","—",1,149.89,0.0],["24/07","Nanuque","MG","Pix","APP_IOS","Flash Delivery","Faturado","—",1,27.39,0.0],["24/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,46.49,0.0],["24/07","Vila Velha","ES","Discover","APP_ANDROID","Flash Delivery","Faturado","—",1,116.89,0.0],["24/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",2,75.88,0.0],["24/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,48.58,0.0],["24/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,3.69,0.0],["24/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",1,47.69,0.0],["24/07","Vila Velha","ES","Pix","APP_ANDROID","Flash Delivery","Faturado","—",3,131.97,0.0],["24/07","Vila Velha","ES","Pix","APP_IOS","Retire em Loja","Faturado","—",1,27.89,0.0],["24/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",3,27.64,4.43],["24/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,62.89,0.0],["24/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",2,332.68,0.0],["24/07","Carlos Chagas","MG","Pix","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",2,131.52,0.0],["24/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,11.89,0.0],["24/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,29.36,0.0],["24/07","Nanuque","MG","Mastercard","APP_IOS","Flash Delivery","Faturado","CRESCERAPP12",1,70.2,0.0],["24/07","Nanuque","MG","Pix","—","Retire em Loja","Faturado","—",2,40.48,0.0],["24/07","Carlos Chagas","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",1,56.78,0.0],["24/07","Nanuque","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,29.97,0.0],["24/07","Carlos Chagas","MG","Pix","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",1,24.98,0.0],["24/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,34.89,0.0],["24/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,12.89,0.0],["24/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,37.58,5.99],["24/07","Carlos Chagas","MG","American Express","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",1,24.98,0.0],["24/07","Nanuque","MG","Mastercard","—","Flash Delivery","Faturado","—",1,29.0,0.0],["24/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,35.89,0.0],["25/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,19.68,0.0],["25/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,23.29,0.0],["25/07","Carlos Chagas","MG","Visa","—","Flash Delivery","Faturado","—",1,44.39,0.0],["25/07","Nanuque","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,99.89,0.0],["25/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Flash Delivery","Faturado","—",1,239.34,0.0],["25/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,20.69,0.0],["25/07","Teófilo Otoni","MG","Mastercard","google","Flash Delivery","Faturado","—",2,129.68,0.0],["25/07","Teófilo Otoni","MG","Pix","APP_IOS","Flash Delivery","Faturado","—",4,77.25,3.35],["25/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,304.09,0.0],["25/07","Nanuque","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",3,23.45,0.0],["25/07","Vila Velha","ES","Pix","—","Flash Delivery","Faturado","—",9,113.31,0.0],["25/07","Sorocaba","SP","Pix","—","Correios","Faturado","—",1,88.0,22.22],["25/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,7.18,0.0],["25/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",2,89.38,0.0],["25/07","Divinópolis","MG","Mastercard","—","Correios","Faturado","—",1,318.62,24.73],["25/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",3,62.33,0.0],["25/07","Teófilo Otoni","MG","Mastercard","APP_IOS","Flash Delivery","Faturado","—",2,174.98,0.0],["25/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,75.42,0.0],["25/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,75.42,0.0],["25/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",1,24.89,0.0],["25/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",1,17.88,5.99],["25/07","Nanuque","MG","Mastercard","APP_ANDROID","Retire em Loja","Faturado","CRESCERAPP12",3,44.15,0.0],["25/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Flash Delivery","Faturado","—",4,109.55,0.0],["25/07","Teófilo Otoni","MG","Pix","google","Retire em Loja","Faturado","—",1,11.89,0.0],["25/07","São Paulo","SP","Mastercard","—","Correios","Cancelado","—",1,179.05,127.25],["25/07","São Paulo","SP","Mastercard","—","Correios","Cancelado","—",1,125.49,73.69],["26/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,13.78,5.99],["26/07","Coxim","MS","Pix","—","Correios","Faturado","—",2,75.13,15.83],["26/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Flash Delivery","Faturado","—",2,61.44,4.89],["26/07","Vila Velha","ES","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,169.89,0.0],["26/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",3,78.77,0.0],["26/07","Porto Alegre","RS","Visa","APP_ANDROID","Correios","Faturado","CRESCERAPP12",1,156.74,23.08],["26/07","Nanuque","MG","Mastercard","APP_IOS","Flash Delivery","Faturado","—",4,99.75,0.0],["26/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",4,50.35,2.75],["26/07","Teófilo Otoni","MG","Mastercard","—","Retire em Loja","Cancelado","—",1,132.79,0.0],["26/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,101.58,0.0],["26/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Retire em Loja","Cancelado","—",1,132.79,0.0],["26/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Retire em Loja","Cancelado","—",1,132.79,0.0],["26/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Retire em Loja","Cancelado","—",1,132.79,0.0],["26/07","Teófilo Otoni","MG","Pix","APP_IOS","Flash Delivery","Faturado","—",1,17.88,5.99],["26/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,132.79,0.0],["26/07","Nanuque","MG","Pix","APP_IOS","Flash Delivery","Faturado","—",1,25.68,5.99],["26/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",3,64.34,0.0],["26/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",2,21.17,0.0],["26/07","Carlos Chagas","MG","Pix","—","Flash Delivery","Faturado","—",8,61.06,0.0],["26/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","CRESCERAPP12",4,56.64,3.12],["26/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",4,62.36,0.0],["26/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,3.69,0.0],["26/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,75.42,0.0],["26/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,75.42,0.0],["26/07","Teófilo Otoni","MG","Pix","APP_IOS","Flash Delivery","Faturado","—",1,32.89,5.99],["26/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",1,34.08,5.99],["26/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",1,25.78,0.0],["26/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,11.89,0.0],["27/07","Vitória","ES","Pix","—","Flash Delivery","Faturado","CRESCERAPP12",2,179.5,0.0],["27/07","Teófilo Otoni","MG","Visa","APP_ANDROID","Flash Delivery","Faturado","—",3,74.54,5.64],["27/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Flash Delivery","Faturado","—",1,88.78,0.0],["27/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Flash Delivery","Faturado","—",1,50.38,5.99],["27/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,104.67,0.0],["27/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,37.39,0.0],["27/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,75.42,0.0],["27/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,75.42,0.0],["27/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,23.56,0.0],["27/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,66.89,0.0],["27/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,99.38,0.0],["27/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,37.78,0.0],["27/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","MOTATRI10",2,42.37,0.0],["27/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","MOTATRI10",1,19.6,0.0],["27/07","Vila Velha","ES","Pix","—","Flash Delivery","Faturado","—",1,54.88,5.99],["27/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,94.69,0.0],["27/07","Vitória","ES","Mastercard","APP_ANDROID","Flash Delivery","Faturado","—",1,85.88,5.99],["27/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,19.78,0.0],["27/07","Vitória","ES","Mastercard","—","Retire em Loja","Faturado","—",1,31.79,0.0],["27/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,18.57,0.0],["27/07","Carlos Chagas","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,35.89,0.0],["27/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",3,106.27,0.0],["27/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",4,76.15,0.0],["27/07","Nanuque","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,14.72,5.99],["27/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,24.89,0.0],["27/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",4,112.33,0.0],["27/07","Teófilo Otoni","MG","Pix","APP_IOS","Correios","Faturado","—",1,119.51,26.73],["27/07","Teófilo Otoni","MG","Discover","APP_IOS","Flash Delivery","Faturado","—",2,72.87,5.3],["27/07","Vila Velha","ES","Pix","APP_ANDROID","Flash Delivery","Faturado","—",3,92.25,0.0],["27/07","Nanuque","MG","Mastercard","APP_ANDROID","Flash Delivery","Faturado","—",1,16.88,5.99],["27/07","São Paulo","SP","Visa","—","Correios","Faturado","—",1,59.91,50.32],["27/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",4,51.14,4.61],["28/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,72.89,0.0],["28/07","Vila Velha","ES","Pix","APP_IOS","Flash Delivery","Faturado","—",1,47.36,5.99],["28/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,47.69,0.0],["28/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","MOTATRI10",1,62.8,0.0],["28/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",6,234.62,0.0],["28/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",4,69.75,0.0],["28/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,11.89,0.0],["28/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,11.89,0.0],["28/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,183.79,0.0],["28/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Correios","Faturado","—",1,74.17,38.5],["28/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",4,110.26,0.0],["28/07","Nanuque","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,11.89,0.0],["28/07","Uberlândia","MG","Mastercard","APP_IOS","Correios","Faturado","—",1,174.97,23.08],["28/07","Teófilo Otoni","MG","Visa","APP_ANDROID","Flash Delivery","Faturado","—",5,115.29,0.0],["28/07","Teófilo Otoni","MG","Mastercard","—","Flash Delivery","Faturado","—",1,89.89,0.0],["28/07","Nanuque","MG","Visa","APP_ANDROID","Flash Delivery","Faturado","—",6,46.0,0.0],["28/07","Vila Velha","ES","Visa","—","Flash Delivery","Faturado","CRESCERAPP12",1,96.79,0.0],["28/07","Teófilo Otoni","MG","Pix","APP_IOS","Flash Delivery","Faturado","—",1,82.89,0.0],["28/07","Vitória","ES","Visa","APP_ANDROID","Flash Delivery","Faturado","—",2,169.05,0.0],["28/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,56.78,0.0],["28/07","Vitória","ES","Mastercard","—","Retire em Loja","Cancelado","—",1,31.79,0.0],["28/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,34.89,0.0],["28/07","Vila Velha","ES","Mastercard","APP_ANDROID","Flash Delivery","Faturado","—",1,74.88,5.99],["28/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",3,99.47,0.0],["28/07","Teófilo Otoni","MG","Mastercard","—","Flash Delivery","Faturado","—",6,136.54,0.0],["28/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,71.82,0.0],["28/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,71.82,0.0],["29/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",1,61.4,0.0],["29/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",5,77.32,3.11],["29/07","Teófilo Otoni","MG","Visa","google","Flash Delivery","Faturado","—",2,149.38,0.0],["29/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,34.39,0.0],["29/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",2,61.4,0.0],["29/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",3,314.23,0.0],["29/07","Carlos Chagas","MG","Mastercard","APP_IOS","Retire em Loja","Faturado","—",1,19.99,0.0],["29/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,2.69,0.0],["29/07","São Paulo","SP","Mastercard","APP_IOS","Correios","Faturado","—",1,155.88,22.89],["29/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,2844.78,0.0],["29/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,11.69,0.0],["29/07","Carlos Chagas","MG","Mastercard","APP_IOS","Retire em Loja","Faturado","—",4,65.26,0.0],["29/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,30.88,5.99],["29/07","Teófilo Otoni","MG","Pix","APP_IOS","Flash Delivery","Faturado","—",1,145.78,0.0],["29/07","Carlos Chagas","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,44.89,0.0],["29/07","Teófilo Otoni","MG","Mastercard","google","Retire em Loja","Cancelado","—",4,259.23,0.0],["29/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",2,43.18,0.0],["29/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,12.89,0.0],["29/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",6,67.54,0.0],["30/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,21.38,0.0],["30/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",1,7.38,0.0],["30/07","Vila Velha","ES","Mastercard","—","Flash Delivery","Faturado","—",3,83.85,5.99],["30/07","Almirante Tamandaré","PR","Pix","—","Correios","Faturado","—",1,67.91,22.02],["30/07","Osasco","SP","Discover","APP_ANDROID","Correios","Faturado","CRESCERAPP12",1,96.85,22.41],["30/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,37.98,0.0],["30/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",1,11.78,0.0],["30/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,11.78,0.0],["30/07","Nanuque","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,38.09,0.0],["30/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",1,127.18,0.0],["30/07","Carlos Chagas","MG","Mastercard","APP_IOS","Retire em Loja","Faturado","—",4,99.76,0.0],["30/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","CRESCERAPP12",3,57.61,0.0],["30/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",4,50.46,0.0],["30/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,304.09,0.0],["30/07","Vitória","ES","Pix","APP_IOS","Retire em Loja","Faturado","CRESCERAPP12",1,50.33,0.0],["30/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,23.89,0.0],["30/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",1,34.89,0.0],["30/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",3,124.26,0.0],["30/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,58.19,0.0],["30/07","Teófilo Otoni","MG","Mastercard","google","Flash Delivery","Cancelado","—",4,299.12,0.0],["30/07","Teófilo Otoni","MG","Mastercard","—","Flash Delivery","Cancelado","—",4,299.12,0.0],["30/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","MOTATRI10",1,59.03,0.0],["30/07","Teófilo Otoni","MG","Pix","APP_IOS","Flash Delivery","Faturado","—",6,78.73,2.83],["30/07","Barueri","SP","Pix","APP_ANDROID","Correios","Faturado","—",4,409.36,51.4],["30/07","Indaiatuba","SP","Pix","—","Correios","Preparando Entrega","—",1,35.79,25.9],["30/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Faturado","—",2,27.61,5.5],["30/07","Teófilo Otoni","MG","Visa","APP_ANDROID","Flash Delivery","Faturado","—",2,42.47,4.22],["30/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,2.89,0.0],["30/07","Ouro Fino","MG","Mastercard","chatgpt.com","Correios","Faturado","—",1,244.83,46.86],["30/07","Cascavel","PR","Mastercard","—","Correios","Faturado","—",1,107.87,31.98],["31/07","Vila Velha","ES","Pix","—","Retire em Loja","Cancelado","—",1,35.91,0.0],["31/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,148.69,0.0],["31/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",1,6.59,0.0],["31/07","Teófilo Otoni","MG","Pix","google","Flash Delivery","Faturado","—",3,206.85,0.0],["31/07","Vila Velha","ES","Pix","—","Retire em Loja","Faturado","—",2,25.58,0.0],["31/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,59.89,0.0],["31/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",2,69.28,0.0],["31/07","Teófilo Otoni","MG","Mastercard","APP_ANDROID","Flash Delivery","Faturado","—",3,102.75,0.0],["31/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",1,35.89,0.0],["31/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,38.58,0.0],["31/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,12.89,0.0],["31/07","Vitória","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,71.58,0.0],["31/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,7.79,0.0],["31/07","Vila Velha","ES","Mastercard","APP_ANDROID","Flash Delivery","Faturado","—",2,195.68,0.0],["31/07","Vila Velha","ES","Mastercard","APP_ANDROID","Flash Delivery","Faturado","CRESCERAPP12",5,234.34,0.0],["31/07","Vila Velha","ES","Mastercard","APP_ANDROID","Flash Delivery","Faturado","—",1,95.38,0.0],["31/07","Vitória","ES","Pix","APP_IOS","Retire em Loja","Faturado","—",5,151.75,0.0],["31/07","Carlos Chagas","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,44.89,0.0],["31/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,117.8,0.0],["31/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",2,67.48,0.0],["31/07","Vila Velha","ES","Mastercard","APP_ANDROID","Retire em Loja","Faturado","—",2,59.11,0.0],["31/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",1,32.98,5.99],["31/07","Vila Velha","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,92.69,0.0],["31/07","Teófilo Otoni","MG","Visa","APP_ANDROID","Flash Delivery","Faturado","—",3,38.16,5.56],["31/07","Teófilo Otoni","MG","Pix","google","Flash Delivery","Faturado","—",5,263.52,0.0],["31/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,151.49,0.0],["31/07","Teófilo Otoni","MG","Pix","google","Flash Delivery","Cancelado","—",4,209.85,31.06],["31/07","Vila Velha","ES","Pix","—","Flash Delivery","Faturado","—",1,43.38,5.99],["31/07","Vitória","ES","Pix","APP_ANDROID","Retire em Loja","Faturado","—",1,7.96,0.0],["31/07","Vila Velha","ES","Pix","APP_IOS","Retire em Loja","Faturado","—",4,28.16,0.0],["31/07","Nanuque","MG","Visa","APP_ANDROID","Retire em Loja","Faturado","—",3,171.96,0.0],["31/07","Teófilo Otoni","MG","Mastercard","—","Flash Delivery","Faturado","—",2,181.16,0.0],["31/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,12.89,0.0],["31/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",2,37.11,5.62],["31/07","Nanuque","MG","Pix","APP_ANDROID","Flash Delivery","Faturado","—",2,29.58,0.0],["31/07","Teófilo Otoni","MG","Pix","APP_ANDROID","Retire em Loja","Faturado","CRESCERAPP12",8,231.67,0.0],["31/07","Teófilo Otoni","MG","Pix","—","Retire em Loja","Faturado","—",1,123.39,0.0],["31/07","Teófilo Otoni","MG","Pix","APP_IOS","Retire em Loja","Faturado","—",1,35.19,0.0],["31/07","Teófilo Otoni","MG","Pix","—","Flash Delivery","Cancelado","—",1,27.88,5.99]];
+const KPIS = {"faturamento": 67633.3, "pedidosTotal": 902, "pedidosFaturados": 811, "pedidosCancelados": 90, "pedidosPreparando": 1, "pctCancelado": 10.0, "ticketMedio": 83.39, "ticketMediano": 50.38, "itensPedido": 1.81, "pedidosPix": 637, "pctPix": 78.5, "ticketCartao": 126.21, "ticketPix": 72.28, "mediaDiaria": 26.2, "pedidosCupom": 136, "pctCupom": 15.1, "receitaPerdida": 28565.58};
+const INSIGHTS = ["Pix domina com <b>78,6%</b> dos pedidos. Cartões geram <b>31,9%</b> do faturamento com ticket médio <b>1,7x maior</b>.", "<b>Teófilo Otoni</b> concentra <b>60,4%</b> do faturamento — forte concentração regional.", "<b>10,0%</b> dos pedidos foram cancelados (90 de 902) — impacto direto na receita.", "<b>16,6%</b> dos pedidos usaram cupom (R$ 14.649,89 em receita com desconto).", "<b>App Android</b> é o canal principal (<b>43,2%</b> dos pedidos).", "<b>35,2%</b> dos pedidos estão sem UtmSource — oportunidades de rastreamento perdidas.", "<b>MG</b> responde por <b>72,3%</b> do faturamento."];
+const CIDADES = [{"cidade": "Teófilo Otoni", "fat": 40902.93, "pedidos": 499, "ticket": 81.97, "pix": 414, "cartao": 85, "pctPix": 82.97, "pctCartao": 17.03, "pctFat": 60.45}, {"cidade": "Vila Velha", "fat": 9991.27, "pedidos": 129, "ticket": 77.45, "pix": 110, "cartao": 19, "pctPix": 85.27, "pctCartao": 14.73, "pctFat": 14.76}, {"cidade": "Vitória", "fat": 3725.33, "pedidos": 40, "ticket": 93.13, "pix": 24, "cartao": 16, "pctPix": 60.0, "pctCartao": 40.0, "pctFat": 5.51}, {"cidade": "Nanuque", "fat": 3359.37, "pedidos": 51, "ticket": 65.87, "pix": 34, "cartao": 17, "pctPix": 66.67, "pctCartao": 33.33, "pctFat": 4.96}, {"cidade": "Carlos Chagas", "fat": 2414.59, "pedidos": 44, "ticket": 54.88, "pix": 31, "cartao": 13, "pctPix": 70.45, "pctCartao": 29.55, "pctFat": 3.57}, {"cidade": "São Paulo", "fat": 1105.08, "pedidos": 10, "ticket": 110.51, "pix": 6, "cartao": 4, "pctPix": 60.0, "pctCartao": 40.0, "pctFat": 1.63}, {"cidade": "Curitiba", "fat": 717.77, "pedidos": 2, "ticket": 358.89, "pix": 0, "cartao": 2, "pctPix": 0, "pctCartao": 100, "pctFat": 1.06}, {"cidade": "Ouro Preto", "fat": 453.64, "pedidos": 1, "ticket": 453.64, "pix": 0, "cartao": 1, "pctPix": 0, "pctCartao": 100, "pctFat": 0.67}, {"cidade": "Barueri", "fat": 409.36, "pedidos": 1, "ticket": 409.36, "pix": 1, "cartao": 0, "pctPix": 100, "pctCartao": 0, "pctFat": 0.6}, {"cidade": "Jaboatão dos Guararapes", "fat": 339.54, "pedidos": 1, "ticket": 339.54, "pix": 0, "cartao": 1, "pctPix": 0, "pctCartao": 100, "pctFat": 0.5}];
+const RECOS = [{"cidade": "Teófilo Otoni", "texto": "Campanha de fidelidade + cross-sell via app."}, {"cidade": "Vila Velha", "texto": "Frete grátis para acelerar conversão."}, {"cidade": "Vitória", "texto": "Público premium — produtos de maior valor."}, {"cidade": "Nanuque", "texto": "Frete grátis para acelerar conversão."}, {"cidade": "Carlos Chagas", "texto": "Upsell com kits e bundles."}];
+const PAGAMENTOS = [{"metodo": "Pix", "fat": 46080.61, "pedidos": 638, "pctPedidos": 70.73, "ticket": 72.23, "min": 1.39, "max": 2844.78, "pctFat": 68.1}, {"metodo": "Mastercard", "fat": 14190.68, "pedidos": 111, "pctPedidos": 12.31, "ticket": 127.84, "min": 7.89, "max": 418.44, "pctFat": 20.97}, {"metodo": "Visa", "fat": 6634.79, "pedidos": 54, "pctPedidos": 5.99, "ticket": 122.87, "min": 11.88, "max": 498.06, "pctFat": 9.8}, {"metodo": "Discover", "fat": 517.75, "pedidos": 6, "pctPedidos": 0.67, "ticket": 86.29, "min": 22.88, "max": 140.48, "pctFat": 0.77}, {"metodo": "Elo", "fat": 220.28, "pedidos": 2, "pctPedidos": 0.22, "ticket": 110.14, "min": 76.2, "max": 144.08, "pctFat": 0.33}, {"metodo": "American Express", "fat": 24.98, "pedidos": 1, "pctPedidos": 0.11, "ticket": 24.98, "min": 24.98, "max": 24.98, "pctFat": 0.04}];
+const CROSS = [{"cidade": "Teófilo Otoni", "total": 499, "pix": "414 (83%)", "master": "57 (11%)", "visa": "25 (5%)", "outros": "3 (1%)"}, {"cidade": "Vila Velha", "total": 129, "pix": "110 (85%)", "master": "13 (10%)", "visa": "5 (4%)", "outros": "1 (1%)"}, {"cidade": "Vitória", "total": 40, "pix": "24 (60%)", "master": "12 (30%)", "visa": "4 (10%)", "outros": "0 (0%)"}, {"cidade": "Nanuque", "total": 51, "pix": "34 (67%)", "master": "9 (18%)", "visa": "7 (14%)", "outros": "1 (2%)"}, {"cidade": "Carlos Chagas", "total": 44, "pix": "31 (70%)", "master": "10 (23%)", "visa": "2 (5%)", "outros": "1 (2%)"}];
+const PAGAMENTOS_INSIGHTS = ["Pix: 70,7% dos pedidos, 68,1% do faturamento. Ticket médio R$ 72,23.", "Cartões: 29,3% dos pedidos, 31,9% do faturamento. Ticket médio R$ 124,07.", "Cartões geram 1,7x mais receita por pedido.", "Estratégias: cupom Pix 5% off acima de R$ 80 para aumentar o ticket médio.", "Manter parcelamento sem juros em cartões para retenção premium."];
+const CANAIS = [{"canal": "APP_ANDROID", "fat": 24415.66, "pedidos": 351, "pct": 66.73, "ticket": 69.56}, {"canal": "APP_IOS", "fat": 13865.5, "pedidos": 151, "pct": 28.71, "ticket": 91.82}, {"canal": "google", "fat": 1314.3, "pedidos": 13, "pct": 2.47, "ticket": 101.1}, {"canal": "CEM", "fat": 488.99, "pedidos": 7, "pct": 1.33, "ticket": 69.86}, {"canal": "chatgpt.com", "fat": 278.39, "pedidos": 2, "pct": 0.38, "ticket": 139.2}, {"canal": "ig", "fat": 123.07, "pedidos": 2, "pct": 0.38, "ticket": 61.54}];
+const SLA = [{"tipo": "Retire em Loja", "fat": 34188.23, "pedidos": 486, "pct": 59.85, "ticket": 70.35}, {"tipo": "Flash Delivery", "fat": 25578.56, "pedidos": 272, "pct": 33.5, "ticket": 94.04}, {"tipo": "Correios", "fat": 7902.3, "pedidos": 54, "pct": 6.65, "ticket": 146.34}];
+const COURRIER = [{"nome": "Flash Delivery (Motoboy Teófilo Otoni)", "pedidos": 171, "pct": 18.96}, {"nome": "Retire na Getúlio Vargas", "pedidos": 129, "pct": 14.3}, {"nome": "Retire na Soares da Costa", "pedidos": 105, "pct": 11.64}, {"nome": "Retire na Loja Marajoara", "pedidos": 87, "pct": 9.65}, {"nome": "Flash Delivery (Motoboy Vila Velha)", "pedidos": 45, "pct": 4.99}, {"nome": "Flash Delivery (Motoboy Nanuque)", "pedidos": 38, "pct": 4.21}, {"nome": "Retire na Loja Glória", "pedidos": 37, "pct": 4.1}, {"nome": "Retire na Loja Vitória", "pedidos": 34, "pct": 3.77}];
+const CANAIS_INSIGHTS = ["App Android: 43,2% dos pedidos, ticket R$ 69,56.", "App iOS: 18,6% dos pedidos, ticket R$ 91,82 (32% maior).", "35,2% dos pedidos estão sem UtmSource — implementar rastreamento.", "Flash Delivery: maior ticket médio entre as entregas.", "Correios: ticket alto — indica clientes externos à região."];
+const EVOLUCAO = [["01/07", "Wednesday", 2054.12, 24, 85.59], ["02/07", "Thursday", 2567.9, 39, 65.84], ["03/07", "Friday", 2058.23, 28, 73.51], ["04/07", "Saturday", 669.99, 12, 55.83], ["05/07", "Sunday", 1585.75, 19, 83.46], ["06/07", "Monday", 3464.61, 33, 104.99], ["07/07", "Tuesday", 3901.08, 34, 114.74], ["08/07", "Wednesday", 1793.29, 25, 71.73], ["09/07", "Thursday", 3193.86, 34, 93.94], ["10/07", "Friday", 2957.22, 29, 101.97], ["11/07", "Saturday", 1527.28, 25, 61.09], ["12/07", "Sunday", 1105.57, 14, 78.97], ["13/07", "Monday", 2311.88, 29, 79.72], ["14/07", "Tuesday", 1601.61, 26, 61.6], ["15/07", "Wednesday", 1143.58, 16, 71.47], ["16/07", "Thursday", 1565.74, 23, 68.08], ["17/07", "Friday", 2118.5, 31, 68.34], ["18/07", "Saturday", 1569.86, 21, 74.76], ["19/07", "Sunday", 2840.24, 15, 189.35], ["20/07", "Monday", 1771.61, 27, 65.62], ["21/07", "Tuesday", 2818.85, 29, 97.2], ["22/07", "Wednesday", 1995.09, 36, 55.42], ["23/07", "Thursday", 1415.03, 25, 56.6], ["24/07", "Friday", 1916.88, 30, 63.9], ["25/07", "Saturday", 2194.75, 24, 91.45], ["26/07", "Sunday", 1508.52, 24, 62.86], ["27/07", "Monday", 2064.08, 32, 64.5], ["28/07", "Tuesday", 2260.08, 26, 86.93], ["29/07", "Wednesday", 4143.57, 18, 230.2], ["30/07", "Thursday", 2316.24, 28, 82.72], ["31/07", "Friday", 3234.08, 36, 89.84]];
+const EVOLUCAO_INSIGHTS = ["Maior faturamento: 29/07/2026 — R$ 4.143,57 (18 pedidos).", "Média diária: R$ 2.182,87 (26,2 pedidos).", "Melhor ticket diário: R$ 230,20, em 29/07.", "Finais de semana tendem a menor volume — campanha de fim de semana recomendada."];
+const PRODUTOS = [[1, "Poviztra 2,40mg 1 caneta Aplic 3ml+4 agulhas Termo", 12320.31, 9, 9, 1368.92], [2, "1 Million Masculino Eau de Toilette", 4559.34, 6, 6, 759.89], [3, "Mounjaro Tirzepatida 5mg Solução Injetável 0,5ml + 4 Cad", 4267.17, 3, 2, 2133.59], [4, "Vacina Humana Herpes Zooster Shingrix Gks Ag", 1959.56, 4, 2, 979.78], [5, "Envelope Com 7 Figurinhas Copa Do Mundo Fifa 2026", 950.87, 215, 17, 47.54], [6, "Poviztra 1,70mg 1 Caneta Aplic 3ml+4 Agulhas Termo", 928.57, 1, 1, 928.57], [7, "Fralda Bigfral Derma Plus Bigfral G 16 Unidades", 788.22, 20, 8, 98.53], [8, "Perfume Masculino Eau de Parfum 212 Vip Black Carolina Herrera", 750.79, 1, 1, 750.79], [9, "Perfume Phantom Rabanne Eau de Toilette 100ml Masculino", 746.89, 1, 1, 746.89], [10, "212 VIP Rosé Carolina Herrera - Perfume Feminino", 740.99, 1, 1, 740.99], [11, "Cloridrato de Valaciclovir 500mg Eurofarma Genérico", 727.12, 8, 2, 363.56], [12, "Pantogar 90 cápsulas", 692.15, 6, 4, 173.04], [13, "G-Tech BSP11, Aparelho de Pressão Digital Automático", 663.95, 5, 5, 132.79], [14, "Jardiance Empagliflozina 10mg 30 comprimidos", 659.16, 4, 4, 164.79], [15, "Fórmula Infantil Ninho Fases 1+ Nestlé 1 a 3 anos 800g", 608.35, 15, 9, 67.59], [16, "Lyberdia 40MG/ML Gotas 50ML A3", 608.18, 2, 2, 304.09], [17, "Aptamil Fórmula Infantil Profutura Gold 1, 800G", 599.45, 5, 5, 119.89], [18, "Protetor Solar Facial FPS 50 Filtrum Sensi Sem Cor 50g", 593.46, 9, 4, 148.37], [19, "Clexane Safety Lock 40mg/0,4ml – 6 Seringas Injetáveis", 581.71, 2, 2, 290.86], [20, "Perfume Rabanne 1 Million Masculino Eau de Toilette 50ml", 549.99, 1, 1, 549.99]];
+const STATUS_SUMMARY = [{"status": "Faturado", "fat": 67633.3, "pedidos": 811, "pctTotal": 89.91, "ticket": 83.39, "pctFat": 99.95, "tag": "ok"}, {"status": "Cancelado", "fat": 28565.58, "pedidos": 90, "pctTotal": 9.98, "ticket": 317.4, "pctFat": 42.21, "tag": "critico"}, {"status": "Preparando Entrega", "fat": 35.79, "pedidos": 1, "pctTotal": 0.11, "ticket": 35.79, "pctFat": 0.05, "tag": "alto"}];
+const CANCEL_CIDADE = [{"cidade": "Teófilo Otoni", "cancelados": 55, "pct": 61.11}, {"cidade": "Vila Velha", "cancelados": 20, "pct": 22.22}, {"cidade": "São Paulo", "cancelados": 5, "pct": 5.56}, {"cidade": "Serra", "cancelados": 3, "pct": 3.33}, {"cidade": "Frederico Westphalen", "cancelados": 1, "pct": 1.11}, {"cidade": "Belo Horizonte", "cancelados": 1, "pct": 1.11}, {"cidade": "Embu-Guaçu", "cancelados": 1, "pct": 1.11}, {"cidade": "São José dos Campos", "cancelados": 1, "pct": 1.11}];
+const CANCEL_PAGAMENTO = [{"pagamento": "Visa", "cancelados": 41, "pct": 45.56}, {"pagamento": "Mastercard", "cancelados": 33, "pct": 36.67}, {"pagamento": "Pix", "cancelados": 13, "pct": 14.44}, {"pagamento": "Discover", "cancelados": 3, "pct": 3.33}];
+const STATUS_RECOS = ["10,0% dos pedidos são cancelados — impacto de R$ 28.565,58 na receita potencial.", "Investigar causa raiz dos cancelamentos: falha no gateway, mudança de ideia ou problemas de entrega.", "Implementar recuperação de carrinho abandonado para pedidos cancelados.", "Oferecer desconto de retomada (5–10%) para clientes que cancelaram nos últimos 7 dias.", "Visa é o método mais cancelado — revisar fluxo de checkout."];
+const CUPONS_SUMMARY = {"comCupom": 136, "pctComCupom": 15.1, "semCupom": 676, "pctSemCupom": 74.9, "fatComCupom": 12502.44, "ticketComCupom": 91.93, "ticketSemCupom": 81.61, "diferenca": 10.32};
+const TOP_CUPONS = [{"cupom": "CRESCERAPP12", "pedidos": 93, "pct": 68.38, "fat": 9857.68, "ticket": 105.997, "cidade": "Teófilo Otoni"}, {"cupom": "MARCELLA10", "pedidos": 15, "pct": 11.03, "fat": 1140.86, "ticket": 76.06, "cidade": "Teófilo Otoni"}, {"cupom": "RANIELLE10", "pedidos": 14, "pct": 10.29, "fat": 746.56, "ticket": 53.33, "cidade": "Nanuque"}, {"cupom": "MOTATRI10", "pedidos": 10, "pct": 7.35, "fat": 399.25, "ticket": 39.93, "cidade": "Teófilo Otoni"}, {"cupom": "crescer15", "pedidos": 1, "pct": 0.74, "fat": 236.66, "ticket": 236.66, "cidade": "Teófilo Otoni"}, {"cupom": "lidiomar10", "pedidos": 1, "pct": 0.74, "fat": 68.3, "ticket": 68.3, "cidade": "Carlos Chagas"}, {"cupom": "maynara10", "pedidos": 1, "pct": 0.74, "fat": 36.8, "ticket": 36.8, "cidade": "Teófilo Otoni"}, {"cupom": "vivi10", "pedidos": 1, "pct": 0.74, "fat": 16.33, "ticket": 16.33, "cidade": "Teófilo Otoni"}];
+const DESCONTOS = [{"tipo": "Frete Grátis MotoBoy", "pedidos": 96, "fat": 14880.72, "pct": 10.64}, {"tipo": "Cupom Clientes App (Banner Site)", "pedidos": 71, "fat": 7117.52, "pct": 7.87}, {"tipo": "Frete Grátis Motoboy Nanuque", "pedidos": 27, "fat": 1725.11, "pct": 2.99}, {"tipo": "Campanha Cupom Blogueiras", "pedidos": 22, "fat": 1227.28, "pct": 2.44}, {"tipo": "Cupom Clientes App + Frete", "pedidos": 13, "fat": 2086.52, "pct": 1.44}, {"tipo": "Leve 3 por R$ 5,99 cada", "pedidos": 10, "fat": 634.79, "pct": 1.11}, {"tipo": "Cupom Motatri", "pedidos": 10, "fat": 399.25, "pct": 1.11}, {"tipo": "Cupom Clientes App + Frete (variação)", "pedidos": 9, "fat": 653.64, "pct": 1.0}, {"tipo": "Campanha Blogueiras + Frete Grátis Moto", "pedidos": 6, "fat": 189.08, "pct": 0.67}, {"tipo": "Campanha Blogueiras + Frete Grátis Moto (v2)", "pedidos": 4, "fat": 592.49, "pct": 0.44}];
+const CUPONS_INSIGHTS = ["Pedidos com cupom têm ticket 13% maior que sem cupom (R$ 91,93 vs R$ 81,61).", "CRESCERAPP12 é o cupom mais usado, com 93 pedidos (68,4% dos cupons aplicados).", "Frete Grátis MotoBoy é a promoção mais eficaz para conversão (96 pedidos, R$ 14.880,72).", "Considerar cupom de retomada para pedidos cancelados.", "15,1% dos pedidos já usam cupom — explorar mais para clientes sem desconto."];
+
+/* ================= THEME HELPERS ================= */
+function cssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+function fmtBRL(v){ return 'R$ ' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtNum(v,d=0){ return Number(v).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d}); }
+
+/* ================= NAV ================= */
+const navItems = document.querySelectorAll('.nav-item');
+const navHighlight = document.getElementById('navHighlight');
+const topbarTitle = document.getElementById('topbarTitle');
+const topbarSub = document.getElementById('topbarSub');
+const viewMeta = {
+  overview:{title:'Visão Geral',sub:'Análise de pedidos e faturamento'},
+  cidades:{title:'Faturamento por Cidade',sub:'Mix de pagamento e oportunidades de campanha'},
+  pagamentos:{title:'Métodos de Pagamento',sub:'Distribuição e comportamento por método'},
+  canais:{title:'Canais & SLA',sub:'Aquisição, entrega e courrier'},
+  evolucao:{title:'Evolução Diária',sub:'Tendência de faturamento e pedidos'},
+  produtos:{title:'Top Produtos',sub:'Ranking dos 20 mais vendidos'},
+  status:{title:'Status & Cancelamentos',sub:'90 pedidos cancelados — impacto na receita'},
+  cupons:{title:'Cupons & Descontos',sub:'Performance de campanhas'},
+  frete:{title:'Frete',sub:'Peso cubado e tabela de frete'},
+  dados:{title:'Dados Detalhados',sub:'Base completa de pedidos'}
+};
+
+function positionHighlight(el){
+  if(!el) return;
+  const parent = el.parentElement;
+  navHighlight.style.transform = `translateY(${el.offsetTop}px)`;
+  navHighlight.style.width = el.offsetWidth + 'px';
+  navHighlight.style.height = el.offsetHeight + 'px';
+  if(parent !== navHighlight.parentElement){
+    parent.insertBefore(navHighlight, parent.firstChild);
+  }
+}
+
+function switchView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  navItems.forEach(n=>n.classList.toggle('active', n.dataset.view===name));
+  const active = document.querySelector(`.nav-item[data-view="${name}"]`);
+  positionHighlight(active);
+  const meta = viewMeta[name];
+  topbarTitle.textContent = meta.title;
+  topbarSub.textContent = meta.sub;
+  window.scrollTo({top:0,behavior:'smooth'});
+  triggerReveals();
+}
+
+navItems.forEach(item=>{
+  item.addEventListener('click', ()=>{
+    switchView(item.dataset.view);
+    if(window.innerWidth<=860){ document.getElementById('sidebar').classList.remove('open'); }
+  });
+});
+window.addEventListener('resize', ()=>{
+  const active = document.querySelector('.nav-item.active');
+  positionHighlight(active);
+});
+
+document.getElementById('menuToggle').addEventListener('click', ()=>{
+  document.getElementById('sidebar').classList.toggle('open');
+});
+
+/* ================= THEME TOGGLE ================= */
+const themeBtn = document.getElementById('themeToggle');
+themeBtn.addEventListener('click', ()=>{
+  const html = document.documentElement;
+  const isLight = html.getAttribute('data-theme') === 'light';
+  html.setAttribute('data-theme', isLight ? 'dark' : 'light');
+  themeBtn.innerHTML = isLight ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
+  Object.values(charts).forEach(c=>c && updateChartTheme(c));
+});
+
+/* ================= REVEAL ON SCROLL ================= */
+const revealObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); } });
+},{threshold:.12});
+function triggerReveals(){
+  document.querySelectorAll('.view.active .reveal').forEach(el=>revealObserver.observe(el));
+}
+
+/* ================= COUNT-UP ================= */
+function countUp(el, target, isCurrency, decimals){
+  const dur = 1100; const start = performance.now();
+  function step(now){
+    const p = Math.min(1,(now-start)/dur);
+    const eased = 1 - Math.pow(1-p,3);
+    const val = target*eased;
+    el.textContent = isCurrency ? fmtBRL(val) : fmtNum(val, decimals||0);
+    if(p<1) requestAnimationFrame(step);
+    else el.textContent = isCurrency ? fmtBRL(target) : fmtNum(target, decimals||0);
+  }
+  requestAnimationFrame(step);
+}
+
+/* ================= KPI CARDS ================= */
+const kpiDefs = [
+  {label:'Faturamento (Faturado)', value:KPIS.faturamento, icon:'fa-sack-dollar', color:'blue', currency:true, sub:'811 pedidos faturados'},
+  {label:'Total de Pedidos', value:KPIS.pedidosTotal, icon:'fa-bag-shopping', color:'green', currency:false, sub: fmtNum(KPIS.mediaDiaria,1)+' faturados/dia em média'},
+  {label:'Taxa de Cancelamento', value:KPIS.pctCancelado, icon:'fa-circle-xmark', color:'red', currency:false, decimals:1, sub:'90 pedidos · R$ 28.565,58 perdidos'},
+  {label:'Ticket Médio', value:KPIS.ticketMedio, icon:'fa-receipt', color:'orange', currency:true, sub:'mediana de '+fmtBRL(KPIS.ticketMediano)},
+  {label:'Itens por Pedido', value:KPIS.itensPedido, icon:'fa-boxes-stacked', color:'green', currency:false, decimals:2, sub:'unidades médias por compra'},
+  {label:'Pedidos via Pix', value:KPIS.pedidosPix, icon:'fa-qrcode', color:'green', currency:false, sub: KPIS.pctPix+'% dos faturados'},
+  {label:'Ticket Cartão', value:KPIS.ticketCartao, icon:'fa-credit-card', color:'orange', currency:true, sub:'vs. '+fmtBRL(KPIS.ticketPix)+' no Pix'},
+  {label:'Pedidos com Cupom', value:KPIS.pedidosCupom, icon:'fa-ticket', color:'blue', currency:false, sub: KPIS.pctCupom+'% dos pedidos'},
+  {label:'Média Diária de Pedidos', value:KPIS.mediaDiaria, icon:'fa-calendar-day', color:'orange', currency:false, decimals:1, sub:'faturados, ao longo de 31 dias'},
+  {label:'Receita Potencial Perdida', value:KPIS.receitaPerdida, icon:'fa-triangle-exclamation', color:'red', currency:true, sub:'em pedidos cancelados'},
+];
+
+function renderKPIs(){
+  const grid = document.getElementById('kpiGrid');
+  grid.innerHTML = kpiDefs.map((k,i)=>`
+    <div class="card kpi-card hoverable reveal" style="transition-delay:${i*40}ms">
+      <div class="kpi-top">
+        <span class="kpi-label">${k.label}</span>
+        <div class="kpi-icon" style="background:rgba(${colorRGB(k.color)},0.15);color:${colorHex(k.color)};">
+          <i class="fa-solid ${k.icon}"></i>
+        </div>
+      </div>
+      <div class="kpi-value" id="kpiVal${i}">0</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>
+  `).join('');
+  kpiDefs.forEach((k,i)=>{
+    const el = document.getElementById('kpiVal'+i);
+    setTimeout(()=>countUp(el, k.value, k.currency, k.decimals||0), 120);
+  });
+}
+function colorRGB(name){
+  return {blue:'62,142,255',green:'43,182,115',orange:'255,152,0',red:'229,57,53'}[name];
+}
+function colorHex(name){
+  return {blue:'var(--blue-light)',green:'var(--green)',orange:'var(--orange)',red:'var(--red)'}[name];
+}
+
+/* ================= INSIGHTS (overview) ================= */
+function renderInsights(){
+  document.getElementById('insightsList').innerHTML = INSIGHTS.map((txt,i)=>`
+    <div class="insight-item"><div class="insight-num">${String(i+1).padStart(2,'0')}</div><p>${txt}</p></div>
+  `).join('');
+}
+
+/* ================= CHART THEME ================= */
+const charts = {};
+function chartColors(){
+  const light = document.documentElement.getAttribute('data-theme')==='light';
+  return {
+    text: light ? '#4B5768' : '#9AA7BD',
+    grid: light ? 'rgba(15,23,42,0.06)' : 'rgba(255,255,255,0.06)',
+    blue:'#0057B8', blueLight:'#3E8EFF', green:'#2BB673', orange:'#FF9800', red:'#E53935',
+    tooltipBg: light ? '#101828' : '#0F1B2E'
+  };
+}
+function baseFont(){ return {family:"'Inter',sans-serif", size:11.5}; }
+function updateChartTheme(chart){
+  const c = chartColors();
+  if(chart.options.scales){
+    Object.values(chart.options.scales).forEach(sc=>{
+      if(sc.ticks) sc.ticks.color = c.text;
+      if(sc.grid) sc.grid.color = c.grid;
+    });
+  }
+  if(chart.options.plugins && chart.options.plugins.legend && chart.options.plugins.legend.labels){
+    chart.options.plugins.legend.labels.color = c.text;
+  }
+  chart.update();
+}
+if (typeof Chart !== 'undefined') { Chart.defaults.font.family = "'Inter',sans-serif"; }
+
+/* ================= OVERVIEW CHARTS ================= */
+function renderOverviewCharts(){
+  const c = chartColors();
+  const labels = EVOLUCAO.map(d=>d[0]);
+  const fat = EVOLUCAO.map(d=>d[2]);
+  charts.overviewEvo = new Chart(document.getElementById('chartOverviewEvo'), {
+    type:'line',
+    data:{ labels, datasets:[{
+      label:'Faturamento', data:fat, borderColor:c.blueLight, borderWidth:2.5, tension:.4,
+      fill:true, backgroundColor:(ctx)=>{
+        const g = ctx.chart.ctx.createLinearGradient(0,0,0,240);
+        g.addColorStop(0,'rgba(62,142,255,0.35)'); g.addColorStop(1,'rgba(62,142,255,0.0)'); return g;
+      }, pointRadius:0, pointHoverRadius:5, pointHoverBackgroundColor:c.blueLight, pointHoverBorderColor:'#fff'
+    }]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      animation:{duration:1200, easing:'easeOutQuart'},
+      plugins:{ legend:{display:false}, tooltip:{ backgroundColor:c.tooltipBg, padding:10, cornerRadius:10, titleFont:baseFont(), bodyFont:baseFont(),
+        callbacks:{ label:(ctx)=>' '+fmtBRL(ctx.parsed.y) } } },
+      scales:{ x:{ ticks:{color:c.text,maxTicksLimit:8,font:baseFont()}, grid:{display:false} },
+               y:{ ticks:{color:c.text,callback:(v)=>'R$ '+(v/1000).toFixed(1)+'k',font:baseFont()}, grid:{color:c.grid} } }
+    }
+  });
+
+  const pix=46080.61, cartao=20825.47, outros=742.73;
+  charts.overviewSplit = new Chart(document.getElementById('chartOverviewSplit'), {
+    type:'doughnut',
+    data:{ labels:['Pix','Cartão','Outros'], datasets:[{ data:[pix,cartao,outros],
+      backgroundColor:[c.green,c.blueLight,c.orange], borderWidth:0, hoverOffset:8 }] },
+    options:{ responsive:true, maintainAspectRatio:false, cutout:'72%',
+      animation:{animateRotate:true, duration:1200},
+      plugins:{ legend:{display:false}, tooltip:{ backgroundColor:c.tooltipBg, padding:10, cornerRadius:10,
+        callbacks:{ label:(ctx)=>' '+ctx.label+': '+fmtBRL(ctx.parsed) } } } }
+  });
+  document.getElementById('splitLegend').innerHTML = `
+    <div class="legend-item"><span class="legend-dot" style="background:${c.green}"></span>Pix · 68,1%</div>
+    <div class="legend-item"><span class="legend-dot" style="background:${c.blueLight}"></span>Cartão · 30,8%</div>
+    <div class="legend-item"><span class="legend-dot" style="background:${c.orange}"></span>Outros · 1,1%</div>`;
+}
+
+/* ================= CIDADES ================= */
+function renderCidades(){
+  const c = chartColors();
+  charts.cidades = new Chart(document.getElementById('chartCidades'), {
+    type:'bar',
+    data:{ labels: CIDADES.map(x=>x.cidade), datasets:[{
+      label:'Faturamento', data:CIDADES.map(x=>x.fat), backgroundColor:c.blueLight, borderRadius:6, maxBarThickness:24
+    }]},
+    options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, animation:{duration:1000},
+      plugins:{ legend:{display:false}, tooltip:{ backgroundColor:c.tooltipBg, padding:10, cornerRadius:10,
+        callbacks:{ label:(ctx)=>' '+fmtBRL(ctx.parsed.x) } } },
+      scales:{ x:{ ticks:{color:c.text,callback:(v)=>'R$ '+(v/1000).toFixed(0)+'k',font:baseFont()}, grid:{color:c.grid} },
+               y:{ ticks:{color:c.text,font:baseFont()}, grid:{display:false} } } }
+  });
+
+  document.getElementById('cidadesMixBody').innerHTML = CIDADES.map(x=>`
+    <tr><td class="strong">${x.cidade}</td><td class="num">${x.pedidos}</td>
+    <td><div class="split-bar"><i style="width:${x.pctPix}%;background:var(--green)"></i><i style="width:${x.pctCartao}%;background:var(--blue-light)"></i></div>
+    <div style="font-size:10.5px;color:var(--text-3);margin-top:4px;">${x.pctPix.toFixed(0)}% Pix · ${x.pctCartao.toFixed(0)}% Cartão</div></td></tr>
+  `).join('');
+
+  document.getElementById('cidadesTableBody').innerHTML = CIDADES.map(x=>`
+    <tr><td class="strong">${x.cidade}</td><td class="num">${fmtBRL(x.fat)}</td><td class="num">${x.pedidos}</td>
+    <td class="num">${fmtBRL(x.ticket)}</td><td class="num">${x.pctPix.toFixed(1)}%</td><td class="num">${x.pctCartao.toFixed(1)}%</td><td class="num">${x.pctFat.toFixed(1)}%</td></tr>
+  `).join('');
+
+  document.getElementById('recoGrid').innerHTML = RECOS.map(r=>`
+    <div class="card reco-card hoverable reveal"><div class="reco-city"><i class="fa-solid fa-location-dot"></i>${r.cidade}</div><p>${r.texto}</p></div>
+  `).join('');
+}
+
+/* ================= PAGAMENTOS ================= */
+function renderPagamentos(){
+  const c = chartColors();
+  const colors = [c.green,c.blueLight,c.blue,c.orange,'#8b6bd1',c.red];
+  charts.pagDonut = new Chart(document.getElementById('chartPagamentosDonut'), {
+    type:'doughnut',
+    data:{ labels:PAGAMENTOS.map(p=>p.metodo), datasets:[{ data:PAGAMENTOS.map(p=>p.fat), backgroundColor:colors, borderWidth:0, hoverOffset:8 }]},
+    options:{ responsive:true, maintainAspectRatio:false, cutout:'68%', animation:{animateRotate:true,duration:1200},
+      plugins:{ legend:{display:false}, tooltip:{ backgroundColor:c.tooltipBg, padding:10, cornerRadius:10,
+        callbacks:{ label:(ctx)=>' '+ctx.label+': '+fmtBRL(ctx.parsed)+' ('+PAGAMENTOS[ctx.dataIndex].pctFat.toFixed(1)+'%)' } } } }
+  });
+  document.getElementById('pagamentosLegend').innerHTML = PAGAMENTOS.map((p,i)=>`
+    <div class="legend-item"><span class="legend-dot" style="background:${colors[i]}"></span>${p.metodo} · ${p.pctFat.toFixed(1)}%</div>
+  `).join('');
+
+  charts.ticketCompare = new Chart(document.getElementById('chartTicketCompare'), {
+    type:'bar',
+    data:{ labels:['Pix','Mastercard','Visa'], datasets:[
+      {label:'Ticket Médio', data:[72.23,127.84,122.87], backgroundColor:[c.green,c.blueLight,c.blue], borderRadius:8, maxBarThickness:60}
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false, animation:{duration:1000},
+      plugins:{ legend:{display:false}, tooltip:{ backgroundColor:c.tooltipBg, padding:10, cornerRadius:10,
+        callbacks:{ label:(ctx)=>' '+fmtBRL(ctx.parsed.y) } } },
+      scales:{ x:{ ticks:{color:c.text,font:baseFont()}, grid:{display:false} },
+               y:{ ticks:{color:c.text,callback:(v)=>'R$ '+v,font:baseFont()}, grid:{color:c.grid} } } }
+  });
+
+  document.getElementById('pagamentosTableBody').innerHTML = PAGAMENTOS.map(p=>`
+    <tr><td class="strong">${p.metodo}</td><td class="num">${fmtBRL(p.fat)}</td><td class="num">${p.pedidos}</td>
+    <td class="num">${p.pctPedidos.toFixed(1)}%</td><td class="num">${fmtBRL(p.ticket)}</td>
+    <td class="num">${fmtBRL(p.min)}</td><td class="num">${fmtBRL(p.max)}</td><td class="num">${p.pctFat.toFixed(1)}%</td></tr>
+  `).join('');
+
+  document.getElementById('pagamentosInsights').innerHTML = PAGAMENTOS_INSIGHTS.map((t,i)=>`
+    <div class="insight-item"><div class="insight-num">${String(i+1).padStart(2,'0')}</div><p>${t}</p></div>
+  `).join('');
+
+  document.getElementById('crossTableBody').innerHTML = CROSS.map(x=>`
+    <tr><td class="strong">${x.cidade}</td><td class="num">${x.total}</td><td>${x.pix}</td><td>${x.master}</td><td>${x.visa}</td><td>${x.outros}</td></tr>
+  `).join('');
+}
+
+/* ================= CANAIS ================= */
+function renderCanais(){
+  const c = chartColors();
+  charts.canais = new Chart(document.getElementById('chartCanais'), {
+    type:'bar',
+    data:{ labels:CANAIS.map(x=>x.canal), datasets:[{ label:'Faturamento', data:CANAIS.map(x=>x.fat), backgroundColor:c.blueLight, borderRadius:6, maxBarThickness:24 }]},
+    options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, animation:{duration:1000},
+      plugins:{ legend:{display:false}, tooltip:{ backgroundColor:c.tooltipBg, padding:10, cornerRadius:10, callbacks:{label:(ctx)=>' '+fmtBRL(ctx.parsed.x)} } },
+      scales:{ x:{ ticks:{color:c.text,callback:(v)=>'R$ '+(v/1000).toFixed(1)+'k',font:baseFont()}, grid:{color:c.grid} },
+               y:{ ticks:{color:c.text,font:baseFont()}, grid:{display:false} } } }
+  });
+  charts.sla = new Chart(document.getElementById('chartSLA'), {
+    type:'bar',
+    data:{ labels:SLA.map(x=>x.tipo), datasets:[{ label:'Faturamento', data:SLA.map(x=>x.fat), backgroundColor:[c.green,c.orange,c.blueLight], borderRadius:6, maxBarThickness:44 }]},
+    options:{ responsive:true, maintainAspectRatio:false, animation:{duration:1000},
+      plugins:{ legend:{display:false}, tooltip:{ backgroundColor:c.tooltipBg, padding:10, cornerRadius:10, callbacks:{label:(ctx)=>' '+fmtBRL(ctx.parsed.y)} } },
+      scales:{ x:{ ticks:{color:c.text,font:baseFont()}, grid:{display:false} },
+               y:{ ticks:{color:c.text,callback:(v)=>'R$ '+(v/1000).toFixed(0)+'k',font:baseFont()}, grid:{color:c.grid} } } }
+  });
+
+  document.getElementById('canaisTableBody').innerHTML = CANAIS.map(x=>`
+    <tr><td class="strong">${x.canal}</td><td class="num">${fmtBRL(x.fat)}</td><td class="num">${x.pedidos}</td><td class="num">${x.pct.toFixed(1)}%</td><td class="num">${fmtBRL(x.ticket)}</td></tr>
+  `).join('');
+  document.getElementById('slaTableBody').innerHTML = SLA.map(x=>`
+    <tr><td class="strong">${x.tipo}</td><td class="num">${fmtBRL(x.fat)}</td><td class="num">${x.pedidos}</td><td class="num">${x.pct.toFixed(1)}%</td><td class="num">${fmtBRL(x.ticket)}</td></tr>
+  `).join('');
+  document.getElementById('courrierTableBody').innerHTML = COURRIER.map(x=>`
+    <tr><td class="strong">${x.nome}</td><td class="num">${x.pedidos}</td>
+    <td><div style="display:flex;align-items:center;gap:8px;"><div class="bar-mini"><i style="width:${x.pct*2.2}%;background:var(--orange)"></i></div><span style="font-size:11.5px;color:var(--text-2);">${x.pct.toFixed(1)}%</span></div></td></tr>
+  `).join('');
+  document.getElementById('canaisInsights').innerHTML = CANAIS_INSIGHTS.map((t,i)=>`
+    <div class="insight-item"><div class="insight-num">${String(i+1).padStart(2,'0')}</div><p>${t}</p></div>
+  `).join('');
+}
+
+/* ================= EVOLUCAO ================= */
+function renderEvolucao(){
+  const c = chartColors();
+  charts.evolucao = new Chart(document.getElementById('chartEvolucao'), {
+    data:{ labels:EVOLUCAO.map(d=>d[0]), datasets:[
+      { type:'bar', label:'Pedidos', data:EVOLUCAO.map(d=>d[3]), backgroundColor:'rgba(255,152,0,0.35)', borderRadius:4, yAxisID:'y1', order:2, maxBarThickness:14 },
+      { type:'line', label:'Faturamento', data:EVOLUCAO.map(d=>d[2]), borderColor:c.blueLight, borderWidth:2.5, tension:.35, pointRadius:2, pointBackgroundColor:c.blueLight, yAxisID:'y', order:1,
+        fill:true, backgroundColor:(ctx)=>{ const g=ctx.chart.ctx.createLinearGradient(0,0,0,320); g.addColorStop(0,'rgba(62,142,255,.28)'); g.addColorStop(1,'rgba(62,142,255,0)'); return g; } }
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false, animation:{duration:1200},
+      interaction:{mode:'index', intersect:false},
+      plugins:{ legend:{labels:{color:c.text, font:baseFont()}}, tooltip:{ backgroundColor:c.tooltipBg, padding:10, cornerRadius:10,
+        callbacks:{ label:(ctx)=> ctx.dataset.label==='Faturamento' ? ' '+fmtBRL(ctx.parsed.y) : ' '+ctx.parsed.y+' pedidos' } } },
+      scales:{
+        x:{ ticks:{color:c.text,maxTicksLimit:15,font:baseFont()}, grid:{display:false} },
+        y:{ position:'left', ticks:{color:c.text,callback:(v)=>'R$ '+(v/1000).toFixed(1)+'k',font:baseFont()}, grid:{color:c.grid} },
+        y1:{ position:'right', ticks:{color:c.text,font:baseFont()}, grid:{display:false} }
+      } }
+  });
+  document.getElementById('evolucaoInsights').innerHTML = EVOLUCAO_INSIGHTS.map((t,i)=>`
+    <div class="insight-item"><div class="insight-num">${String(i+1).padStart(2,'0')}</div><p>${t}</p></div>
+  `).join('');
+  document.getElementById('evolucaoTableBody').innerHTML = EVOLUCAO.map(d=>`
+    <tr><td>${d[0]}</td><td>${d[1]}</td><td class="num">${fmtBRL(d[2])}</td><td class="num">${d[3]}</td><td class="num">${fmtBRL(d[4])}</td></tr>
+  `).join('');
+}
+
+/* ================= PRODUTOS ================= */
+function renderProdutos(){
+  const c = chartColors();
+  const top10 = PRODUTOS.slice(0,10);
+  charts.produtos = new Chart(document.getElementById('chartProdutos'), {
+    type:'bar',
+    data:{ labels:top10.map(p=>p[1].length>28? p[1].slice(0,28)+'…':p[1]), datasets:[{ data:top10.map(p=>p[2]), backgroundColor:c.orange, borderRadius:6, maxBarThickness:22 }]},
+    options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, animation:{duration:1000},
+      plugins:{ legend:{display:false}, tooltip:{ backgroundColor:c.tooltipBg, padding:10, cornerRadius:10, callbacks:{label:(ctx)=>' '+fmtBRL(ctx.parsed.x)} } },
+      scales:{ x:{ ticks:{color:c.text,callback:(v)=>'R$ '+v,font:baseFont()}, grid:{color:c.grid} },
+               y:{ ticks:{color:c.text,font:{family:"'Inter',sans-serif",size:10.5}}, grid:{display:false} } } }
+  });
+  document.getElementById('produtosTableBody').innerHTML = PRODUTOS.map(p=>`
+    <tr><td><span class="rank-chip ${p[0]<=3?'top':''}">${p[0]}</span></td><td class="strong">${p[1]}</td>
+    <td class="num">${fmtBRL(p[2])}</td><td class="num">${p[3]}</td><td class="num">${p[4]}</td><td class="num">${fmtBRL(p[5])}</td></tr>
+  `).join('');
+}
+
+/* ================= STATUS & CANCELAMENTOS ================= */
+function renderStatus(){
+  document.getElementById('statusSummary').innerHTML = STATUS_SUMMARY.map(s=>`
+    <div class="card metric-card reveal">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <span class="mlabel" style="margin-bottom:0;">${s.status}</span>
+        <span class="tag ${s.tag}">${s.tag==='ok'?'OK':s.tag==='critico'?'CRÍTICO':'ATENÇÃO'}</span>
+      </div>
+      <div class="mvalue" style="font-size:22px;">${fmtBRL(s.fat)}</div>
+      <div style="font-size:12px;color:var(--text-2);margin-bottom:8px;">${s.pedidos} pedidos (${s.pctTotal.toFixed(1)}% do total) · ticket ${fmtBRL(s.ticket)}</div>
+      <div class="bar-mini" style="width:100%;"><i style="width:${s.pctFat}%;background:${s.tag==='critico'?'var(--red)':s.tag==='alto'?'var(--orange)':'var(--green)'}"></i></div>
+    </div>
+  `).join('');
+
+  document.getElementById('cancelCidadeBody').innerHTML = CANCEL_CIDADE.map(x=>`
+    <tr><td class="strong">${x.cidade}</td><td class="num">${x.cancelados}</td>
+    <td><div style="display:flex;align-items:center;gap:8px;"><div class="bar-mini"><i style="width:${x.pct}%;background:var(--red)"></i></div><span style="font-size:11.5px;color:var(--text-2);">${x.pct.toFixed(1)}%</span></div></td></tr>
+  `).join('');
+
+  document.getElementById('cancelPagamentoBody').innerHTML = CANCEL_PAGAMENTO.map(x=>`
+    <tr><td class="strong">${x.pagamento}</td><td class="num">${x.cancelados}</td>
+    <td><div style="display:flex;align-items:center;gap:8px;"><div class="bar-mini"><i style="width:${x.pct}%;background:var(--red)"></i></div><span style="font-size:11.5px;color:var(--text-2);">${x.pct.toFixed(1)}%</span></div></td></tr>
+  `).join('');
+
+  document.getElementById('statusRecos').innerHTML = STATUS_RECOS.map((t,i)=>`
+    <div class="insight-item"><div class="insight-num">${String(i+1).padStart(2,'0')}</div><p>${t}</p></div>
+  `).join('');
+}
+
+/* ================= CUPONS & DESCONTOS ================= */
+function renderCupons(){
+  const s = CUPONS_SUMMARY;
+  const defs = [
+    {label:'Pedidos com Cupom', value:s.comCupom, icon:'fa-ticket', color:'green', sub:s.pctComCupom+'% do total'},
+    {label:'Pedidos sem Cupom', value:s.semCupom, icon:'fa-receipt', color:'blue', sub:s.pctSemCupom+'% do total'},
+    {label:'Faturamento com Cupom', value:s.fatComCupom, icon:'fa-sack-dollar', color:'orange', currency:true, sub:'receita com desconto aplicado'},
+    {label:'Ticket com Cupom', value:s.ticketComCupom, icon:'fa-arrow-trend-up', color:'green', currency:true, sub:'+'+fmtBRL(s.diferenca)+' vs. sem cupom'},
+    {label:'Ticket sem Cupom', value:s.ticketSemCupom, icon:'fa-arrow-trend-down', color:'blue', currency:true, sub:'ticket base, sem desconto'},
+  ];
+  document.getElementById('cuponsSummary').innerHTML = defs.map((k,i)=>`
+    <div class="card kpi-card hoverable reveal" style="transition-delay:${i*40}ms">
+      <div class="kpi-top">
+        <span class="kpi-label">${k.label}</span>
+        <div class="kpi-icon" style="background:rgba(${colorRGB(k.color)},0.15);color:${colorHex(k.color)};"><i class="fa-solid ${k.icon}"></i></div>
+      </div>
+      <div class="kpi-value" id="cupVal${i}">0</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>
+  `).join('');
+  defs.forEach((k,i)=>{
+    const el = document.getElementById('cupVal'+i);
+    setTimeout(()=>countUp(el, k.value, !!k.currency, 0), 120);
+  });
+
+  document.getElementById('cuponsTableBody').innerHTML = TOP_CUPONS.map(x=>`
+    <tr><td class="strong">${x.cupom}</td><td class="num">${x.pedidos}</td><td>${x.pct.toFixed(1)}%</td>
+    <td class="num">${fmtBRL(x.fat)}</td><td class="num">${fmtBRL(x.ticket)}</td><td>${x.cidade}</td></tr>
+  `).join('');
+
+  document.getElementById('cuponsInsights').innerHTML = CUPONS_INSIGHTS.map((t,i)=>`
+    <div class="insight-item"><div class="insight-num">${String(i+1).padStart(2,'0')}</div><p>${t}</p></div>
+  `).join('');
+
+  document.getElementById('descontosTableBody').innerHTML = DESCONTOS.map(x=>`
+    <tr><td class="strong">${x.tipo}</td><td class="num">${x.pedidos}</td><td class="num">${fmtBRL(x.fat)}</td>
+    <td><div style="display:flex;align-items:center;gap:8px;"><div class="bar-mini"><i style="width:${x.pct*8}%;background:var(--blue-light)"></i></div><span style="font-size:11.5px;color:var(--text-2);">${x.pct.toFixed(1)}%</span></div></td></tr>
+  `).join('');
+}
+
+/* ================= DADOS DETALHADOS ================= */
+let dPage = 1; const dPageSize = 25;
+let dFiltered = ORDERS;
+/* ORDERS fields: 0 Data,1 Cidade,2 UF,3 Pagamento,4 Canal,5 Entrega,6 Status,7 Cupom,8 Itens,9 ValorTotal,10 Frete */
+
+function uniqueVals(idx){ return [...new Set(ORDERS.map(o=>o[idx]))].filter(v=>v && v!=='—').sort(); }
+
+function populateFilters(){
+  const fCidade = document.getElementById('fCidade');
+  const fPagamento = document.getElementById('fPagamento');
+  const fCanal = document.getElementById('fCanal');
+  const fEntrega = document.getElementById('fEntrega');
+  const fStatus = document.getElementById('fStatus');
+  uniqueVals(1).forEach(v=>fCidade.insertAdjacentHTML('beforeend', `<option value="${v}">${v}</option>`));
+  uniqueVals(3).forEach(v=>fPagamento.insertAdjacentHTML('beforeend', `<option value="${v}">${v}</option>`));
+  uniqueVals(4).forEach(v=>fCanal.insertAdjacentHTML('beforeend', `<option value="${v}">${v}</option>`));
+  uniqueVals(5).forEach(v=>fEntrega.insertAdjacentHTML('beforeend', `<option value="${v}">${v}</option>`));
+  uniqueVals(6).forEach(v=>fStatus.insertAdjacentHTML('beforeend', `<option value="${v}">${v}</option>`));
+  [fCidade,fPagamento,fCanal,fEntrega,fStatus].forEach(sel=>sel.addEventListener('change', applyFilters));
+  document.getElementById('dSearch').addEventListener('input', applyFilters);
+}
+
+function applyFilters(){
+  const q = document.getElementById('dSearch').value.trim().toLowerCase();
+  const cidade = document.getElementById('fCidade').value;
+  const pagamento = document.getElementById('fPagamento').value;
+  const canal = document.getElementById('fCanal').value;
+  const entrega = document.getElementById('fEntrega').value;
+  const status = document.getElementById('fStatus').value;
+  dFiltered = ORDERS.filter(o=>{
+    if(cidade && o[1]!==cidade) return false;
+    if(pagamento && o[3]!==pagamento) return false;
+    if(canal && o[4]!==canal) return false;
+    if(entrega && o[5]!==entrega) return false;
+    if(status && o[6]!==status) return false;
+    if(q && !(o[1].toLowerCase().includes(q) || o[3].toLowerCase().includes(q) || o[2].toLowerCase().includes(q))) return false;
+    return true;
+  });
+  dPage = 1;
+  renderDadosTable();
+}
+
+function renderDadosTable(){
+  const tbody = document.getElementById('dadosTableBody');
+  const start = (dPage-1)*dPageSize;
+  const rows = dFiltered.slice(start, start+dPageSize);
+  tbody.innerHTML = rows.map(o=>`
+    <tr><td>${o[0]}</td><td class="strong">${o[1]}</td><td>${o[2]}</td>
+    <td>${o[3]}</td><td>${o[4]}</td><td>${o[5]}</td>
+    <td><span class="tag ${o[6]==='Cancelado'?'critico':o[6]==='Faturado'?'ok':'alto'}">${o[6]}</span></td>
+    <td>${o[7]}</td>
+    <td class="num">${o[8]}</td><td class="num">${fmtBRL(o[9])}</td><td class="num">${o[10]>0?fmtBRL(o[10]):'—'}</td></tr>
+  `).join('') || `<tr><td colspan="11" style="text-align:center;color:var(--text-3);padding:30px;">Nenhum pedido encontrado com esses filtros.</td></tr>`;
+  const totalPages = Math.max(1, Math.ceil(dFiltered.length/dPageSize));
+  document.getElementById('dInfo').textContent = `${dFiltered.length} pedidos · página ${dPage} de ${totalPages}`;
+  document.getElementById('dPrev').disabled = dPage<=1;
+  document.getElementById('dNext').disabled = dPage>=totalPages;
+}
+document.getElementById('dPrev').addEventListener('click', ()=>{ if(dPage>1){dPage--; renderDadosTable();} });
+document.getElementById('dNext').addEventListener('click', ()=>{
+  const totalPages = Math.max(1, Math.ceil(dFiltered.length/dPageSize));
+  if(dPage<totalPages){dPage++; renderDadosTable();}
+});
+
+/* ================= GLOBAL SEARCH ================= */
+document.getElementById('globalSearch').addEventListener('keydown', (e)=>{
+  if(e.key==='Enter'){
+    const val = e.target.value.trim();
+    switchView('dados');
+    document.getElementById('dSearch').value = val;
+    applyFilters();
+  }
+});
+
+/* ================= INIT ================= */
+function safe(fn){ try{ fn(); }catch(e){ console.error(e); } }
+function init(){
+  safe(renderKPIs);
+  safe(renderInsights);
+  safe(renderOverviewCharts);
+  safe(renderCidades);
+  safe(renderPagamentos);
+  safe(renderCanais);
+  safe(renderEvolucao);
+  safe(renderProdutos);
+  safe(renderStatus);
+  safe(renderCupons);
+  safe(populateFilters);
+  safe(renderDadosTable);
+  positionHighlight(document.querySelector('.nav-item.active'));
+  triggerReveals();
+}
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
