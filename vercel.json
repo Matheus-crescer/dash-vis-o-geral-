@@ -1,1 +1,6 @@
-
+{
+  "functions": {
+    "api/upload.js": { "maxDuration": 30 },
+    "api/data.js": { "maxDuration": 10 }
+  }
+}
