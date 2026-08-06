@@ -74,12 +74,11 @@ module.exports = async (req, res) => {
 
     // Publica o data.json no Blob público conectado ao projeto
     const blob = await put('data.json', json, {
-      access: 'public',
-      contentType: 'application/json',
-      addRandomSuffix: false,
-      allowOverwrite: true,
-      storeId: process.env.BLOB_STORE_ID
-    });
+  access: 'public',
+  contentType: 'application/json',
+  addRandomSuffix: false,
+  allowOverwrite: true
+});
 
     return res.status(200).json({
       ok: true,
