@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atualizar dados · Pedidos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{
+  --blue:#0057B8; --blue-light:#3E8EFF; --green:#2BB673; --orange:#FF9800; --red:#E53935;
+  --bg-deep:#070B14; --bg-panel: rgba(255,255,255,0.04);
+  --panel-border: rgba(255,255,255,0.09); --text-1:#F2F5FA; --text-2:#9AA7BD; --text-3:#5E6C82;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'Inter',sans-serif; min-height:100vh; color:var(--text-1);
+  background:
+    radial-gradient(1200px 600px at 85% -10%, rgba(0,87,184,0.25), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(43,182,115,0.14), transparent 60%),
+    var(--bg-deep);
+  display:flex; align-items:center; justify-content:center; padding:24px;
+}
+.card{
+  width:100%; max-width:480px; background:var(--bg-panel); border:1px solid var(--panel-border);
+  border-radius:22px; padding:34px 32px; backdrop-filter:blur(20px) saturate(150%);
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+.brand{ display:flex; align-items:center; gap:12px; margin-bottom:26px; }
+.brand-mark{
+  width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--blue-light));
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:17px;
+  box-shadow:0 6px 18px rgba(0,87,184,0.45); flex-shrink:0;
+}
+h1{ font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:600; }
+.brand span{ font-size:12px; color:var(--text-3); }
+p.lead{ font-size:13px; color:var(--text-2); line-height:1.6; margin-bottom:22px; }
+
+label{ display:block; font-size:12px; font-weight:600; color:var(--text-2); margin-bottom:7px; }
+input[type="password"]{
+  width:100%; background:rgba(255,255,255,0.05); border:1px solid var(--panel-border); color:var(--text-1);
+  padding:12px 14px; border-radius:11px; font-size:14px; outline:none; margin-bottom:18px; font-family:inherit;
+  transition:border-color .2s ease;
+}
+input[type="password"]:focus{ border-color:var(--blue-light); }
+
+.dropzone{
+  border:2px dashed var(--panel-border); border-radius:16px; padding:30px 20px; text-align:center;
+  cursor:pointer; transition:all .25s ease; margin-bottom:20px; position:relative;
+}
+.dropzone.drag{ border-color:var(--blue-light); background:rgba(62,142,255,0.08); }
+.dropzone i{ font-size:26px; color:var(--blue-light); margin-bottom:10px; display:block; }
+.dropzone .main-txt{ font-size:13.5px; font-weight:600; margin-bottom:4px; }
+.dropzone .sub-txt{ font-size:11.5px; color:var(--text-3); }
+.dropzone input[type="file"]{ position:absolute; inset:0; opacity:0; cursor:pointer; }
+.file-chip{
+  display:none; align-items:center; gap:10px; background:rgba(43,182,115,0.1); border:1px solid rgba(43,182,115,0.3);
+  border-radius:11px; padding:10px 14px; font-size:12.5px; margin-bottom:18px;
+}
+.file-chip i{ color:var(--green); }
+.file-chip span{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+button.submit{
+  width:100%; padding:13px; border:none; border-radius:12px; font-family:inherit; font-size:14px; font-weight:700;
+  background:linear-gradient(120deg,var(--blue),var(--blue-light)); color:#fff; cursor:pointer;
+  box-shadow:0 8px 24px rgba(0,87,184,.35); transition:transform .2s ease, opacity .2s ease;
+}
+button.submit:hover:not(:disabled){ transform:translateY(-2px); }
+button.submit:disabled{ opacity:.5; cursor:not-allowed; }
+
+.msg{ margin-top:16px; padding:12px 14px; border-radius:11px; font-size:12.8px; line-height:1.5; display:none; }
+.msg.ok{ display:block; background:rgba(43,182,115,0.1); border:1px solid rgba(43,182,115,0.3); color:#8fe0b8; }
+.msg.err{ display:block; background:rgba(229,57,53,0.1); border:1px solid rgba(229,57,53,0.3); color:#ff9d9a; }
+.msg a{ color:#fff; font-weight:700; }
+
+.back{ display:inline-flex; align-items:center; gap:7px; font-size:12.5px; color:var(--text-3); margin-top:22px; text-decoration:none; }
+.back:hover{ color:var(--text-1); }
+
+.spin{ animation:spin 0.8s linear infinite; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="brand">
+    <div class="brand-mark"><i class="fa-solid fa-capsules"></i></div>
+    <div>
+      <h1>Atualizar dados do painel</h1>
+      <span>Somente você deve acessar esta página</span>
+    </div>
+  </div>
+  <p class="lead">Envie a planilha mais recente (mesmo modelo de sempre). Ao concluir, o painel público é atualizado na hora para todo mundo que acessar o link.</p>
+
+  <form id="uploadForm">
+    <label for="password">Senha</label>
+    <input type="password" id="password" placeholder="Senha de atualização" autocomplete="current-password">
+
+    <label>Planilha (.xlsx)</label>
+    <div class="dropzone" id="dropzone">
+      <i class="fa-solid fa-cloud-arrow-up"></i>
+      <div class="main-txt">Arraste o arquivo aqui ou clique para escolher</div>
+      <div class="sub-txt">Apenas arquivos .xlsx</div>
+      <input type="file" id="fileInput" accept=".xlsx">
+    </div>
+    <div class="file-chip" id="fileChip"><i class="fa-solid fa-file-excel"></i><span id="fileName"></span></div>
+
+    <button type="submit" class="submit" id="submitBtn">Enviar e atualizar painel</button>
+  </form>
+
+  <div class="msg" id="msgBox"></div>
+
+  <a href="/" class="back"><i class="fa-solid fa-arrow-left"></i> Voltar para o painel</a>
+</div>
+
+<script>
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+const fileChip = document.getElementById('fileChip');
+const fileName = document.getElementById('fileName');
+const form = document.getElementById('uploadForm');
+const submitBtn = document.getElementById('submitBtn');
+const msgBox = document.getElementById('msgBox');
+let selectedFile = null;
+
+function setFile(f){
+  if(!f) return;
+  if(!f.name.toLowerCase().endsWith('.xlsx')){
+    showMsg('Envie um arquivo .xlsx válido.', 'err');
+    return;
+  }
+  selectedFile = f;
+  fileName.textContent = f.name;
+  fileChip.style.display = 'flex';
+}
+
+fileInput.addEventListener('change', e => setFile(e.target.files[0]));
+['dragenter','dragover'].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.add('drag'); }));
+['dragleave','drop'].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.remove('drag'); }));
+dropzone.addEventListener('drop', e => { if(e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]); });
+
+function showMsg(html, kind){
+  msgBox.className = 'msg ' + kind;
+  msgBox.innerHTML = html;
+}
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const password = document.getElementById('password').value;
+  if(!password){ showMsg('Digite a senha.', 'err'); return; }
+  if(!selectedFile){ showMsg('Selecione um arquivo .xlsx.', 'err'); return; }
+
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<i class="fa-solid fa-spinner spin"></i> Processando planilha...';
+  msgBox.className = 'msg';
+
+  try{
+    const buffer = await selectedFile.arrayBuffer();
+    const resp = await fetch('/api/upload', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/octet-stream',
+        'x-upload-password': password
+      },
+      body: buffer
+    });
+    const data = await resp.json();
+    if(!resp.ok){
+      showMsg((data && data.error) ? data.error : 'Erro ao enviar. Tente novamente.', 'err');
+    } else {
+      showMsg(
+        `<i class="fa-solid fa-circle-check"></i> Painel atualizado! ${data.pedidos} pedidos processados` +
+        (data.periodo ? ` (${data.periodo})` : '') + `. <a href="/">Ver painel público →</a>`,
+        'ok'
+      );
+    }
+  }catch(err){
+    showMsg('Falha de conexão: ' + err.message, 'err');
+  }finally{
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = 'Enviar e atualizar painel';
+  }
+});
+</script>
+</body>
+</html>
