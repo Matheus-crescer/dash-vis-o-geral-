@@ -23,7 +23,6 @@ function getRawBody(req) {
     }
 
     const chunks = [];
-
     req.on('data', (chunk) => chunks.push(chunk));
     req.on('end', () => resolve(Buffer.concat(chunks)));
     req.on('error', reject);
@@ -52,10 +51,10 @@ module.exports = async (req, res) => {
     });
   }
 
-  // Verifica token do Vercel Blob
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+  // Verifica conexão do Blob
+  if (!process.env.BLOB_STORE_ID) {
     return res.status(500).json({
-      error: 'BLOB_READ_WRITE_TOKEN não está configurada nas variáveis de ambiente do projeto na Vercel.'
+      error: 'BLOB_STORE_ID não está configurada nas variáveis de ambiente do projeto na Vercel.'
     });
   }
 
@@ -79,13 +78,13 @@ module.exports = async (req, res) => {
     const data = computeFromOrders(orders, extra);
     const json = JSON.stringify(data);
 
-    // Salva/atualiza o data.json no Blob público
+    // Salva/atualiza o data.json no Blob público conectado ao projeto
     const blob = await put('data.json', json, {
       access: 'public',
       contentType: 'application/json',
       addRandomSuffix: false,
       allowOverwrite: true,
-      token: process.env.BLOB_READ_WRITE_TOKEN
+      storeId: process.env.BLOB_STORE_ID
     });
 
     return res.status(200).json({
