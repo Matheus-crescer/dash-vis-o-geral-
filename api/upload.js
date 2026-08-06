@@ -31,11 +31,7 @@ module.exports = async (req, res) => {
     });
   }
 
-  if (!process.env.BLOB_STORE_ID) {
-    return res.status(500).json({
-      error: 'A variável BLOB_STORE_ID não está configurada nas variáveis de ambiente do projeto na Vercel.'
-    });
-  }
+
 
   const password = req.headers['x-upload-password'];
   if (!password || password !== process.env.UPLOAD_PASSWORD) {
@@ -61,12 +57,11 @@ module.exports = async (req, res) => {
     const json = JSON.stringify(data);
 
     const blob = await put('data.json', json, {
-      access: 'public',
-      contentType: 'application/json',
-      addRandomSuffix: false,
-      allowOverwrite: true,
-      storeId: process.env.BLOB_STORE_ID
-    });
+  access: 'public',
+  contentType: 'application/json',
+  addRandomSuffix: false,
+  allowOverwrite: true
+});
 
     return res.status(200).json({
       ok: true,
