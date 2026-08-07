@@ -164,7 +164,20 @@ form.addEventListener('submit', async (e) => {
       },
       body: buffer
     });
-    const data = await resp.json();
+    const rawText = await resp.text();
+    let data;
+    try{
+      data = JSON.parse(rawText);
+    }catch(parseErr){
+      showMsg(
+        `O servidor respondeu de um jeito inesperado (HTTP ${resp.status}). ` +
+        `Isso costuma ser um erro dentro da função /api/upload na Vercel. ` +
+        `Abra <b>Vercel → seu projeto → Deployments → este deploy → aba Functions → api/upload</b> ` +
+        `e veja a última mensagem de erro nos logs.`,
+        'err'
+      );
+      return;
+    }
     if(!resp.ok){
       showMsg((data && data.error) ? data.error : 'Erro ao enviar. Tente novamente.', 'err');
     } else {

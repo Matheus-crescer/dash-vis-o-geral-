@@ -3,28 +3,43 @@
 // The public dashboard (index.html) calls this on every page load.
 'use strict';
 
-const { list } = require('@vercel/blob');
+function safeSend(res, status, payload) {
+  try {
+    res.status(status).json(payload);
+  } catch (e) {
+    try { res.end(JSON.stringify(payload)); } catch (e2) { /* give up */ }
+  }
+}
 
 module.exports = async (req, res) => {
-  if (req.method !== 'GET') {
-    res.status(405).json({ error: 'Método não permitido.' });
-    return;
-  }
-
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    res.status(404).json({ error: 'Nenhum Blob Store conectado ainda.' });
-    return;
-  }
-
   try {
+    if (req.method !== 'GET') {
+      safeSend(res, 405, { error: 'Método não permitido.' });
+      return;
+    }
+
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      safeSend(res, 404, { error: 'Nenhum Blob Store conectado ainda.' });
+      return;
+    }
+
+    let list;
+    try {
+      ({ list } = require('@vercel/blob'));
+    } catch (reqErr) {
+      console.error('require error:', reqErr);
+      safeSend(res, 500, { error: 'Falha ao carregar dependências no servidor: ' + reqErr.message });
+      return;
+    }
+
     const { blobs } = await list({ prefix: 'data.json', limit: 1 });
     if (!blobs.length) {
-      res.status(404).json({ error: 'Nenhuma planilha publicada ainda.' });
+      safeSend(res, 404, { error: 'Nenhuma planilha publicada ainda.' });
       return;
     }
     const resp = await fetch(blobs[0].url, { cache: 'no-store' });
     if (!resp.ok) {
-      res.status(502).json({ error: 'Falha ao buscar os dados publicados.' });
+      safeSend(res, 502, { error: 'Falha ao buscar os dados publicados.' });
       return;
     }
     const json = await resp.text();
@@ -32,7 +47,7 @@ module.exports = async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.status(200).send(json);
   } catch (err) {
-    console.error('data error:', err);
-    res.status(500).json({ error: err.message });
+    console.error('data fatal error:', err);
+    safeSend(res, 500, { error: err && err.message ? err.message : String(err) });
   }
 };
