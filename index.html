@@ -299,6 +299,26 @@ td.strong{color:var(--text-1);font-weight:600;}
 /* ---------- Footer ---------- */
 .foot{margin-top:34px;padding:18px 0;text-align:center;font-size:11.5px;color:var(--text-3);}
 
+/* ---------- Evolução filters ---------- */
+.evo-btn{
+  padding:8px 14px;border-radius:9px;border:1px solid var(--panel-border);background:rgba(255,255,255,0.04);
+  color:var(--text-2);font-size:12.3px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;
+  transition:all .2s ease; white-space:nowrap;
+}
+.evo-btn:hover{ color:var(--text-1); border-color:var(--panel-border-strong); }
+.evo-btn.active{ background:linear-gradient(120deg,var(--blue),var(--blue-light)); border-color:transparent; color:#fff; }
+.evo-date{
+  background:rgba(255,255,255,0.045);border:1px solid var(--panel-border);color:var(--text-1);
+  padding:7px 10px;border-radius:9px;font-size:12.3px;outline:none;font-family:'Inter',sans-serif;color-scheme:dark;
+}
+html[data-theme="light"] .evo-date{ color-scheme:light; }
+.compare-stat{ display:flex;flex-direction:column;gap:4px;padding:16px 18px; }
+.compare-stat .label{ font-size:11.5px;color:var(--text-2);font-weight:600; }
+.compare-stat .value{ font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700; }
+.compare-stat .delta{ font-size:11.5px;font-weight:700; }
+.compare-stat .delta.up{ color:var(--green); }
+.compare-stat .delta.down{ color:var(--red); }
+
 /* ---------- Scroll reveal ---------- */
 .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease, transform .6s cubic-bezier(.16,1,.3,1);}
 .reveal.in{opacity:1;transform:translateY(0);}
@@ -562,13 +582,35 @@ td.strong{color:var(--text-1);font-weight:600;}
         <div class="view-head">
           <div class="eyebrow"><i class="fa-solid fa-chart-line"></i> Evolução Diária</div>
           <h2>Tendência de faturamento e pedidos</h2>
-          <p>Análise temporal com tendência e sazonalidade ao longo dos 31 dias de julho.</p>
+          <p id="evolucaoSub">Análise temporal com tendência e sazonalidade ao longo do período.</p>
+        </div>
+
+        <div class="card pad mb reveal" style="padding:16px 18px;">
+          <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+            <div class="evo-filter-group" id="evoFilterGroup" style="display:flex;gap:6px;flex-wrap:wrap;">
+              <button class="evo-btn active" data-mode="all">Tudo</button>
+              <button class="evo-btn" data-mode="month">Mês atual</button>
+              <button class="evo-btn" data-mode="prevMonth">Mês anterior</button>
+              <button class="evo-btn" data-mode="week">Semana atual</button>
+              <button class="evo-btn" data-mode="today">Hoje</button>
+              <button class="evo-btn" data-mode="compare"><i class="fa-solid fa-code-compare" style="margin-right:5px;"></i>Comparar meses</button>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;margin-left:auto;">
+              <input type="date" id="evoFrom" class="evo-date">
+              <span style="color:var(--text-3);font-size:12px;">até</span>
+              <input type="date" id="evoTo" class="evo-date">
+              <button class="evo-btn" id="evoApplyRange">Aplicar</button>
+            </div>
+          </div>
+          <div id="evoRangeLabel" style="margin-top:10px;font-size:11.8px;color:var(--text-3);"></div>
         </div>
 
         <div class="card hoverable pad mb reveal">
           <div class="section-title"><i class="fa-solid fa-chart-area"></i>Faturamento × Pedidos por dia</div>
           <div class="chart-holder" style="height:340px;"><canvas id="chartEvolucao"></canvas></div>
         </div>
+
+        <div id="evoCompareBlock" style="display:none;" class="mb"></div>
 
         <div class="grid-2-rev">
           <div class="card insight-card reveal">
@@ -911,8 +953,14 @@ function newChart(key, canvasId, cfg){
   if(charts[key]){ try{ charts[key].destroy(); }catch(e){} }
   const el = document.getElementById(canvasId);
   if(!el) return null;
-  charts[key] = new Chart(el, cfg);
-  return charts[key];
+  try{
+    if(typeof Chart === 'undefined') throw new Error('Chart.js indisponível');
+    charts[key] = new Chart(el, cfg);
+    return charts[key];
+  }catch(e){
+    console.error('chart error ('+key+'):', e);
+    return null;
+  }
 }
 function chartColors(){
   const light = document.documentElement.getAttribute('data-theme')==='light';
@@ -942,8 +990,8 @@ if (typeof Chart !== 'undefined') { Chart.defaults.font.family = "'Inter',sans-s
 /* ================= OVERVIEW CHARTS ================= */
 function renderOverviewCharts(){
   const c = chartColors();
-  const labels = EVOLUCAO.map(d=>d[0]);
-  const fat = EVOLUCAO.map(d=>d[2]);
+  const labels = EVOLUCAO.map(d=>d.dataLabel);
+  const fat = EVOLUCAO.map(d=>d.fat);
   newChart('overviewEvo', 'chartOverviewEvo', {
     type:'line',
     data:{ labels, datasets:[{
@@ -1088,15 +1136,46 @@ function renderCanais(){
 }
 
 /* ================= EVOLUCAO ================= */
-function renderEvolucao(){
+/* ================= EVOLUÇÃO: filtros de data ================= */
+function evoAnchorDate(){
+  if(!EVOLUCAO || !EVOLUCAO.length) return new Date();
+  const maxKey = EVOLUCAO.reduce((m,d)=> d.dataKey>m ? d.dataKey : m, EVOLUCAO[0].dataKey);
+  return new Date(maxKey+'T00:00:00');
+}
+function isoDate(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function startOfWeek(d){ const x=new Date(d); const day=(x.getDay()+6)%7; x.setDate(x.getDate()-day); return x; } // Monday
+function monthKey(dataKey){ return dataKey.slice(0,7); }
+
+function filterEvolucaoByMode(mode){
+  if(!EVOLUCAO || !EVOLUCAO.length) return [];
+  const anchor = evoAnchorDate();
+  if(mode==='all') return EVOLUCAO;
+  if(mode==='today'){ const k = isoDate(anchor); return EVOLUCAO.filter(d=>d.dataKey===k); }
+  if(mode==='week'){
+    const start = startOfWeek(anchor); const startK = isoDate(start);
+    const end = new Date(start); end.setDate(end.getDate()+6); const endK = isoDate(end);
+    return EVOLUCAO.filter(d=> d.dataKey>=startK && d.dataKey<=endK);
+  }
+  if(mode==='month'){ const mk = monthKey(isoDate(anchor)); return EVOLUCAO.filter(d=>monthKey(d.dataKey)===mk); }
+  if(mode==='prevMonth'){
+    const prev = new Date(anchor.getFullYear(), anchor.getMonth()-1, 1);
+    const mk = monthKey(isoDate(prev));
+    return EVOLUCAO.filter(d=>monthKey(d.dataKey)===mk);
+  }
+  return EVOLUCAO;
+}
+
+let evoCurrentMode = 'all';
+
+function renderEvoChart(data){
   const c = chartColors();
   newChart('evolucao', 'chartEvolucao', {
-    data:{ labels:EVOLUCAO.map(d=>d[0]), datasets:[
-      { type:'bar', label:'Pedidos', data:EVOLUCAO.map(d=>d[3]), backgroundColor:'rgba(255,152,0,0.35)', borderRadius:4, yAxisID:'y1', order:2, maxBarThickness:14 },
-      { type:'line', label:'Faturamento', data:EVOLUCAO.map(d=>d[2]), borderColor:c.blueLight, borderWidth:2.5, tension:.35, pointRadius:2, pointBackgroundColor:c.blueLight, yAxisID:'y', order:1,
+    data:{ labels:data.map(d=>d.dataLabel), datasets:[
+      { type:'bar', label:'Pedidos', data:data.map(d=>d.pedidos), backgroundColor:'rgba(255,152,0,0.35)', borderRadius:4, yAxisID:'y1', order:2, maxBarThickness:14 },
+      { type:'line', label:'Faturamento', data:data.map(d=>d.fat), borderColor:c.blueLight, borderWidth:2.5, tension:.35, pointRadius:2, pointBackgroundColor:c.blueLight, yAxisID:'y', order:1,
         fill:true, backgroundColor:(ctx)=>{ const g=ctx.chart.ctx.createLinearGradient(0,0,0,320); g.addColorStop(0,'rgba(62,142,255,.28)'); g.addColorStop(1,'rgba(62,142,255,0)'); return g; } }
     ]},
-    options:{ responsive:true, maintainAspectRatio:false, animation:{duration:1200},
+    options:{ responsive:true, maintainAspectRatio:false, animation:{duration:900},
       interaction:{mode:'index', intersect:false},
       plugins:{ legend:{labels:{color:c.text, font:baseFont()}}, tooltip:{ backgroundColor:c.tooltipBg, padding:10, cornerRadius:10,
         callbacks:{ label:(ctx)=> ctx.dataset.label==='Faturamento' ? ' '+fmtBRL(ctx.parsed.y) : ' '+ctx.parsed.y+' pedidos' } } },
@@ -1106,11 +1185,143 @@ function renderEvolucao(){
         y1:{ position:'right', ticks:{color:c.text,font:baseFont()}, grid:{display:false} }
       } }
   });
-  document.getElementById('evolucaoInsights').innerHTML = EVOLUCAO_INSIGHTS.map((t,i)=>`
+  document.getElementById('evolucaoTableBody').innerHTML = data.length ? data.map(d=>`
+    <tr><td>${d.dataLabel}</td><td>${d.dia}</td><td class="num">${fmtBRL(d.fat)}</td><td class="num">${d.pedidos}</td><td class="num">${fmtBRL(d.ticket)}</td></tr>
+  `).join('') : `<tr><td colspan="5" style="text-align:center;color:var(--text-3);padding:24px;">Nenhum dia nesse intervalo.</td></tr>`;
+
+  const label = document.getElementById('evoRangeLabel');
+  if(label){
+    if(!data.length){ label.textContent = 'Sem dados para o filtro selecionado.'; }
+    else{
+      const fat = data.reduce((a,d)=>a+d.fat,0);
+      const pedidos = data.reduce((a,d)=>a+d.pedidos,0);
+      label.textContent = `${data.length} dia(s) · ${data[0].dataLabel} a ${data[data.length-1].dataLabel} · ${fmtBRL(fat)} · ${fmtNum(pedidos)} pedidos`;
+    }
+  }
+}
+
+function setEvoMode(mode){
+  evoCurrentMode = mode;
+  document.querySelectorAll('.evo-btn[data-mode]').forEach(b=>b.classList.toggle('active', b.dataset.mode===mode));
+  document.getElementById('evoCompareBlock').style.display = 'none';
+  document.getElementById('chartEvolucao').closest('.card').style.display = '';
+  document.querySelector('#view-evolucao .grid-2-rev').style.display = '';
+
+  if(mode==='compare'){
+    renderEvoCompare();
+    return;
+  }
+  const data = filterEvolucaoByMode(mode);
+  renderEvoChart(data);
+}
+
+function pctDelta(cur, prev){
+  if(!prev) return null;
+  return Math.round((cur-prev)/prev*1000)/10;
+}
+
+function renderEvoCompare(){
+  document.getElementById('chartEvolucao').closest('.card').style.display = 'none';
+  document.querySelector('#view-evolucao .grid-2-rev').style.display = 'none';
+  const block = document.getElementById('evoCompareBlock');
+  block.style.display = 'block';
+
+  const anchor = evoAnchorDate();
+  const curKey = monthKey(isoDate(anchor));
+  const prev = new Date(anchor.getFullYear(), anchor.getMonth()-1, 1);
+  const prevKey = monthKey(isoDate(prev));
+
+  const curData = EVOLUCAO.filter(d=>monthKey(d.dataKey)===curKey).sort((a,b)=>a.dataKey<b.dataKey?-1:1);
+  const prevData = EVOLUCAO.filter(d=>monthKey(d.dataKey)===prevKey).sort((a,b)=>a.dataKey<b.dataKey?-1:1);
+
+  if(!prevData.length){
+    block.innerHTML = `
+      <div class="card pad" style="text-align:center;padding:40px 24px;">
+        <i class="fa-solid fa-calendar-xmark" style="font-size:24px;color:var(--text-3);margin-bottom:12px;display:block;"></i>
+        <div style="font-size:14px;font-weight:600;margin-bottom:6px;">Sem dados do mês anterior nesta planilha</div>
+        <div style="font-size:12.5px;color:var(--text-2);max-width:480px;margin:0 auto;line-height:1.6;">
+          Essa planilha cobre apenas ${curData.length ? 'o período atual' : 'um período'}. Para comparar mês a mês de forma automática,
+          é preciso manter um histórico das planilhas enviadas — hoje cada envio substitui os dados anteriores.
+          Se quiser, posso configurar isso como próxima melhoria.
+        </div>
+      </div>`;
+    return;
+  }
+
+  const curFat = curData.reduce((a,d)=>a+d.fat,0), curPed = curData.reduce((a,d)=>a+d.pedidos,0);
+  const prevFat = prevData.reduce((a,d)=>a+d.fat,0), prevPed = prevData.reduce((a,d)=>a+d.pedidos,0);
+  const dFat = pctDelta(curFat, prevFat), dPed = pctDelta(curPed, prevPed);
+
+  const c = chartColors();
+  const maxDay = Math.max(31, ...curData.map(d=>+d.dataLabel.slice(0,2)), ...prevData.map(d=>+d.dataLabel.slice(0,2)));
+  const dayLabels = Array.from({length:maxDay}, (_,i)=>i+1);
+  const curByDay = {}; curData.forEach(d=>curByDay[+d.dataLabel.slice(0,2)] = d.fat);
+  const prevByDay = {}; prevData.forEach(d=>prevByDay[+d.dataLabel.slice(0,2)] = d.fat);
+
+  block.innerHTML = `
+    <div class="grid-3 mb">
+      <div class="card compare-stat reveal in">
+        <span class="label">Mês atual — Faturamento</span>
+        <span class="value">${fmtBRL(curFat)}</span>
+        ${dFat!==null ? `<span class="delta ${dFat>=0?'up':'down'}"><i class="fa-solid fa-arrow-${dFat>=0?'up':'down'}"></i> ${Math.abs(dFat)}% vs. mês anterior</span>` : ''}
+      </div>
+      <div class="card compare-stat reveal in">
+        <span class="label">Mês atual — Pedidos</span>
+        <span class="value">${fmtNum(curPed)}</span>
+        ${dPed!==null ? `<span class="delta ${dPed>=0?'up':'down'}"><i class="fa-solid fa-arrow-${dPed>=0?'up':'down'}"></i> ${Math.abs(dPed)}% vs. mês anterior</span>` : ''}
+      </div>
+      <div class="card compare-stat reveal in">
+        <span class="label">Mês anterior — Faturamento</span>
+        <span class="value">${fmtBRL(prevFat)}</span>
+        <span class="delta" style="color:var(--text-3);">${fmtNum(prevPed)} pedidos</span>
+      </div>
+    </div>
+    <div class="card hoverable pad reveal in">
+      <div class="section-title"><i class="fa-solid fa-code-compare"></i>Faturamento por dia do mês — atual × anterior</div>
+      <div class="chart-holder" style="height:320px;"><canvas id="chartEvoCompare"></canvas></div>
+    </div>
+  `;
+
+  newChart('evoCompare', 'chartEvoCompare', {
+    type:'line',
+    data:{ labels:dayLabels, datasets:[
+      { label:'Mês atual', data:dayLabels.map(d=>curByDay[d] ?? null), borderColor:c.blueLight, backgroundColor:c.blueLight, borderWidth:2.5, tension:.35, spanGaps:true, pointRadius:0 },
+      { label:'Mês anterior', data:dayLabels.map(d=>prevByDay[d] ?? null), borderColor:c.orange, backgroundColor:c.orange, borderWidth:2, borderDash:[5,4], tension:.35, spanGaps:true, pointRadius:0 }
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false, animation:{duration:900},
+      plugins:{ legend:{labels:{color:c.text, font:baseFont()}}, tooltip:{ backgroundColor:c.tooltipBg, padding:10, cornerRadius:10,
+        callbacks:{ label:(ctx)=> ' '+ctx.dataset.label+': '+fmtBRL(ctx.parsed.y) } } },
+      scales:{
+        x:{ title:{display:true,text:'Dia do mês',color:c.text,font:baseFont()}, ticks:{color:c.text,font:baseFont()}, grid:{display:false} },
+        y:{ ticks:{color:c.text,callback:(v)=>'R$ '+(v/1000).toFixed(1)+'k',font:baseFont()}, grid:{color:c.grid} }
+      } }
+  });
+}
+
+function wireEvoFilters(){
+  document.querySelectorAll('.evo-btn[data-mode]').forEach(btn=>{
+    btn.addEventListener('click', ()=> setEvoMode(btn.dataset.mode));
+  });
+  document.getElementById('evoApplyRange').addEventListener('click', ()=>{
+    const from = document.getElementById('evoFrom').value;
+    const to = document.getElementById('evoTo').value;
+    if(!from && !to) return;
+    document.querySelectorAll('.evo-btn[data-mode]').forEach(b=>b.classList.remove('active'));
+    document.getElementById('evoCompareBlock').style.display = 'none';
+    document.getElementById('chartEvolucao').closest('.card').style.display = '';
+    document.querySelector('#view-evolucao .grid-2-rev').style.display = '';
+    const data = EVOLUCAO.filter(d => (!from || d.dataKey>=from) && (!to || d.dataKey<=to));
+    renderEvoChart(data);
+  });
+}
+
+function renderEvolucao(){
+  const sub = document.getElementById('evolucaoSub');
+  if(sub && EVOLUCAO.length) sub.textContent = `Análise temporal de ${EVOLUCAO[0].dataLabel} a ${EVOLUCAO[EVOLUCAO.length-1].dataLabel} — use os filtros para focar em um período específico.`;
+  wireEvoFilters();
+  setEvoMode('all');
+  document.getElementById('evolucaoInsights').innerHTML = (EVOLUCAO_INSIGHTS||[]).map((t,i)=>`
     <div class="insight-item"><div class="insight-num">${String(i+1).padStart(2,'0')}</div><p>${t}</p></div>
-  `).join('');
-  document.getElementById('evolucaoTableBody').innerHTML = EVOLUCAO.map(d=>`
-    <tr><td>${d[0]}</td><td>${d[1]}</td><td class="num">${fmtBRL(d[2])}</td><td class="num">${d[3]}</td><td class="num">${fmtBRL(d[4])}</td></tr>
   `).join('');
 }
 
